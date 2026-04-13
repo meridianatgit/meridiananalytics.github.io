@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Meridian Analytics</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: radial-gradient(ellipse at center, #ffffff 0%, #dce6f0 100%);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      font-family: Georgia, 'Times New Roman', serif;
+      color: #1a3a5c;
+    }
+
+    .container {
+      text-align: center;
+      padding: 2rem;
+    }
+
+    .logo {
+      width: 100%;
+      max-width: 500px;
+      height: auto;
+    }
+
+    .divider {
+      width: 320px;
+      height: 1px;
+      background: linear-gradient(to right, #e67e22, #f39c12);
+      margin: 2rem auto;
+      opacity: 0.6;
+    }
+
+    .coming-soon {
+      font-family: Arial, sans-serif;
+      font-size: 13px;
+      letter-spacing: 3px;
+      color: #7f8c8d;
+      text-transform: uppercase;
+      margin-bottom: 0.75rem;
+    }
+
+    .tagline {
+      font-family: Georgia, serif;
+      font-size: 16px;
+      color: #4a80aa;
+      font-style: italic;
+      margin-top: 0.5rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <!-- Logo (SVG inline so no external file needed) -->
+    <svg class="logo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 200" font-family="Georgia, 'Times New Roman', serif">
+      <defs>
+        <linearGradient id="globeGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" style="stop-color:#0d1f33;stop-opacity:1"/>
+          <stop offset="60%" style="stop-color:#1a3a5c;stop-opacity:1"/>
+          <stop offset="100%" style="stop-color:#4a90c4;stop-opacity:1"/>
+        </linearGradient>
+        <linearGradient id="accentGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" style="stop-color:#e67e22;stop-opacity:1"/>
+          <stop offset="100%" style="stop-color:#f39c12;stop-opacity:1"/>
+        </linearGradient>
+        <radialGradient id="shineGrad" cx="65%" cy="45%" r="55%" fx="65%" fy="45%">
+          <stop offset="0%" style="stop-color:#6ab0d8;stop-opacity:0.25"/>
+          <stop offset="100%" style="stop-color:#000000;stop-opacity:0"/>
+        </radialGradient>
+        <clipPath id="circleClip"><circle cx="90" cy="100" r="68"/></clipPath>
+        <filter id="haloSm" x="-80%" y="-80%" width="260%" height="260%">
+          <feGaussianBlur in="SourceGraphic" stdDeviation="2" result="blur"/>
+          <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+        </filter>
+      </defs>
+      <circle cx="90" cy="100" r="68" fill="url(#globeGrad)"/>
+      <circle cx="90" cy="100" r="68" fill="url(#shineGrad)"/>
+      <g clip-path="url(#circleClip)" stroke="white" stroke-width="1" fill="none" opacity="0.2">
+        <line x1="22" y1="34" x2="158" y2="34"/><line x1="22" y1="56" x2="158" y2="56"/>
+        <line x1="22" y1="78" x2="158" y2="78"/><line x1="22" y1="100" x2="158" y2="100"/>
+        <line x1="22" y1="122" x2="158" y2="122"/><line x1="22" y1="144" x2="158" y2="144"/>
+        <line x1="22" y1="166" x2="158" y2="166"/>
+        <ellipse cx="90" cy="100" rx="20" ry="68"/><ellipse cx="90" cy="100" rx="45" ry="68"/>
+        <ellipse cx="90" cy="100" rx="60" ry="68"/><line x1="90" y1="32" x2="90" y2="168"/>
+      </g>
+      <g clip-path="url(#circleClip)" fill="white" opacity="0.12">
+        <circle cx="55" cy="92" r="1.5"/><circle cx="58" cy="115" r="1.5"/>
+        <circle cx="78" cy="138" r="1.5"/><circle cx="130" cy="100" r="1.5"/>
+        <circle cx="99" cy="118" r="1.5"/>
+      </g>
+      <g clip-path="url(#circleClip)" fill="white" opacity="0.22">
+        <circle cx="60" cy="78" r="2"/><circle cx="74" cy="120" r="2"/>
+        <circle cx="95" cy="100" r="2"/><circle cx="108" cy="108" r="2"/>
+        <circle cx="115" cy="118" r="2"/><circle cx="67" cy="105" r="1.8"/>
+      </g>
+      <g clip-path="url(#circleClip)" fill="white" opacity="0.38">
+        <circle cx="88" cy="55" r="2"/><circle cx="112" cy="58" r="2.2"/>
+        <circle cx="120" cy="70" r="2"/><circle cx="105" cy="85" r="2.2"/>
+        <circle cx="88" cy="130" r="2.2"/><circle cx="65" cy="130" r="2"/>
+      </g>
+      <g clip-path="url(#circleClip)" fill="white" opacity="0.60">
+        <circle cx="72" cy="65" r="2.5"/><circle cx="80" cy="60" r="2.5"/>
+        <circle cx="100" cy="62" r="2.5"/><circle cx="46" cy="88" r="2.2"/>
+      </g>
+      <g clip-path="url(#circleClip)" fill="white" opacity="0.85" filter="url(#haloSm)">
+        <circle cx="128" cy="82" r="2.8"/><circle cx="118" cy="90" r="2.5"/>
+        <circle cx="55" cy="75" r="2.5"/><circle cx="50" cy="112" r="2.8"/>
+        <circle cx="40" cy="125" r="2.2"/><circle cx="70" cy="142" r="2.5"/>
+      </g>
+      <g clip-path="url(#circleClip)" fill="none" stroke-width="1.4">
+        <line x1="68" y1="82" x2="110" y2="72" stroke="#f39c12" opacity="0.75"/>
+        <line x1="110" y1="72" x2="122" y2="96" stroke="#f39c12" opacity="0.75"/>
+        <line x1="68" y1="82" x2="76" y2="108" stroke="#f39c12" opacity="0.75"/>
+        <line x1="76" y1="108" x2="96" y2="118" stroke="#f39c12" opacity="0.75"/>
+        <line x1="122" y1="96" x2="96" y2="118" stroke="#f39c12" opacity="0.75"/>
+      </g>
+      <g fill="#ffe8b0" clip-path="url(#circleClip)">
+        <circle cx="68" cy="82" r="4" stroke="white" stroke-opacity="0.6" stroke-width="0.8"/>
+        <circle cx="110" cy="72" r="4" stroke="white" stroke-opacity="0.6" stroke-width="0.8"/>
+        <circle cx="96" cy="118" r="4" stroke="white" stroke-opacity="0.6" stroke-width="0.8"/>
+        <circle cx="76" cy="108" r="3" stroke="white" stroke-opacity="0.6" stroke-width="0.8"/>
+        <circle cx="122" cy="96" r="3" stroke="white" stroke-opacity="0.6" stroke-width="0.8"/>
+      </g>
+      <text x="178" y="88" font-size="35" font-weight="bold" fill="#1a3a5c" letter-spacing="1" font-family="Georgia, serif">MERIDIAN</text>
+      <text x="178" y="124" font-size="28" font-weight="normal" fill="#4a80aa" letter-spacing="8" font-family="Georgia, serif">ANALYTICS</text>
+      <rect x="178" y="135" width="285" height="4" rx="2" fill="url(#accentGrad)"/>
+      <text x="178" y="160" font-size="13" fill="#7f8c8d" letter-spacing="2" font-family="Arial, sans-serif">GLOBAL SOCIAL RESEARCH</text>
+    </svg>
+
+    <div class="divider"></div>
+
+    <p class="coming-soon">Site coming soon</p>
+    <p class="tagline">meridiananalytics.org</p>
+
+  </div>
+</body>
+</html>
