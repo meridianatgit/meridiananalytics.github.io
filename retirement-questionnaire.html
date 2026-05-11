@@ -1,0 +1,2254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Retirement Forecast – Client Questionnaire</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Source+Sans+3:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+:root{
+  --navy:#1a2744;--navy-light:#243156;--gold:#c9a84c;--gold-light:#e8c97a;
+  --cream:#f7f4ef;--cream-dark:#ede9e1;--slate:#5a6478;--text:#1e2333;
+  --text-light:#6b7280;--white:#ffffff;--error:#b91c1c;
+  --border:#d4cfc6;--info-bg:#f0f4ff;--info-border:#c7d4f5;
+  --warn-bg:#fefce8;--warn-border:#fbbf24;
+  --branch-bg:#fff8f0;--branch-border:#f5c07a;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Source Sans 3',sans-serif;background:var(--cream);color:var(--text);min-height:100vh;}
+header{background:var(--navy);padding:1.5rem 2rem 1rem;position:sticky;top:0;z-index:100;box-shadow:0 2px 16px rgba(0,0,0,.28);}
+header h1{font-family:'Playfair Display',serif;font-size:1.35rem;color:var(--gold);letter-spacing:.02em;}
+header p{color:rgba(255,255,255,.55);font-size:.78rem;margin-top:.2rem;font-weight:300;}
+.progress-wrap{margin-top:.85rem;display:flex;align-items:center;gap:.75rem;}
+.progress-bar{flex:1;height:3px;background:rgba(255,255,255,.12);border-radius:2px;overflow:hidden;}
+.progress-fill{height:100%;background:var(--gold);border-radius:2px;transition:width .5s ease;}
+.progress-label{color:var(--gold-light);font-size:.75rem;white-space:nowrap;font-weight:500;min-width:110px;text-align:right;}
+.container{max-width:720px;margin:0 auto;padding:2rem 1.25rem 5rem;}
+.section-card{background:var(--white);border-radius:8px;border:1px solid var(--border);margin-bottom:1.5rem;display:none;overflow:hidden;}
+.section-card.active{display:block;animation:fadeIn .25s ease;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
+.section-header{background:var(--navy);padding:1rem 1.5rem;display:flex;align-items:center;gap:.75rem;}
+.section-num{width:26px;height:26px;background:var(--gold);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:700;color:var(--navy);flex-shrink:0;}
+.section-title{font-family:'Playfair Display',serif;color:var(--white);font-size:1.05rem;font-weight:400;}
+.section-subtitle{color:rgba(255,255,255,.5);font-size:.75rem;margin-top:.15rem;}
+.section-body{padding:1.25rem 1.5rem;}
+.intro-text-area{background:var(--cream);border:1px dashed var(--border);border-radius:6px;padding:1rem 1.25rem;font-size:.85rem;color:var(--text-light);margin-bottom:1.25rem;line-height:1.6;font-style:italic;}
+.person-banner{background:var(--navy-light);border-radius:6px;padding:.7rem 1rem;margin-bottom:.9rem;font-size:.92rem;color:var(--white);}
+.person-banner strong{color:var(--gold);}
+.branch-block{background:var(--branch-bg);border:1px solid var(--branch-border);border-radius:6px;padding:1rem 1.25rem;margin-top:.65rem;}
+.branch-label{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#92540a;margin-bottom:.75rem;display:flex;align-items:center;gap:.4rem;}
+.branch-label::before{content:'↳';font-size:.85rem;}
+.sub-label{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--slate);margin:1rem 0 .6rem;padding-bottom:.35rem;border-bottom:1px solid var(--border);}
+.q-row{margin-bottom:1.3rem;}
+.q-row:last-child{margin-bottom:0;}
+.q-label{display:flex;align-items:baseline;gap:.5rem;margin-bottom:.35rem;}
+.q-num{font-size:.7rem;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:.06em;flex-shrink:0;min-width:2.4rem;}
+.q-text{font-size:.85rem;font-weight:600;color:var(--navy);text-transform:uppercase;letter-spacing:.04em;}
+.q-text .opt{font-weight:400;color:var(--text-light);text-transform:none;letter-spacing:0;font-style:italic;}
+.info-toggle{display:inline-flex;align-items:center;gap:.3rem;font-size:.72rem;color:var(--slate);cursor:pointer;background:none;border:none;font-family:inherit;padding:.15rem .4rem;border-radius:3px;transition:background .15s,color .15s;margin-top:.25rem;}
+.info-toggle:hover{background:var(--info-bg);color:var(--navy);}
+.info-toggle .arrow{font-size:.6rem;transition:transform .2s;}
+.info-toggle.open .arrow{transform:rotate(90deg);}
+.info-box{background:var(--info-bg);border:1px solid var(--info-border);border-radius:5px;padding:.7rem .9rem;font-size:.8rem;color:#2a3a6e;line-height:1.6;margin-top:.35rem;display:none;white-space:pre-wrap;}
+.info-box.open{display:block;}
+.short-hint{font-size:.78rem;color:var(--text-light);margin-top:.25rem;line-height:1.45;}
+/* Person grid */
+.person-grid{display:grid;grid-template-columns:180px 1fr 1fr;border:1px solid var(--border);border-radius:6px;overflow:hidden;margin-top:.4rem;}
+.person-grid.single-col{grid-template-columns:180px 1fr;}
+.pg-header{background:var(--cream-dark);padding:.45rem .75rem;font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid var(--border);}
+.pg-header.you-hdr{color:var(--navy);border-left:1px solid var(--border);}
+.pg-header.sp-hdr{color:#7a5c1e;border-left:1px solid var(--border);}
+.pg-label{background:var(--cream);padding:.55rem .75rem;font-size:.8rem;font-weight:600;color:var(--navy);display:flex;align-items:center;border-bottom:1px solid var(--border);}
+.pg-cell{padding:.35rem .5rem;border-left:1px solid var(--border);border-bottom:1px solid var(--border);background:var(--white);display:flex;align-items:center;gap:.3rem;}
+.pg-cell .ds{color:var(--text-light);font-size:.9rem;flex-shrink:0;}
+.pg-row-last .pg-label,.pg-row-last .pg-cell{border-bottom:none;}
+/* Inputs */
+input[type="text"],input[type="number"],input[type="date"],select{
+  width:100%;padding:.5rem .65rem;border:1.5px solid var(--border);border-radius:5px;
+  font-family:'Source Sans 3',sans-serif;font-size:.9rem;color:var(--text);background:var(--white);
+  transition:border-color .2s,box-shadow .2s;-webkit-appearance:none;}
+input:focus,select:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px rgba(201,168,76,.14);}
+/* Placeholder styling */
+input::placeholder{color:var(--text-light);}
+.dollar-row{display:flex;align-items:center;gap:.4rem;margin-top:.35rem;}
+.dollar-row .ds{color:var(--text-light);font-size:.95rem;flex-shrink:0;}
+.dollar-row input{max-width:220px;}
+.fmt-preview{font-size:.75rem;color:var(--slate);margin-top:.2rem;min-height:1em;}
+.pct-row{display:flex;align-items:center;gap:.4rem;margin-top:.35rem;}
+.pct-row input{max-width:120px;}
+.pct-row .ps{color:var(--text-light);font-size:.95rem;}
+/* Total savings box */
+.total-savings-box{background:var(--navy);border-radius:6px;padding:.85rem 1.1rem;margin-top:1.1rem;display:flex;align-items:center;justify-content:space-between;}
+.total-savings-box .ts-label{font-size:.78rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:rgba(255,255,255,.65);}
+.total-savings-box .ts-value{font-family:'Playfair Display',serif;font-size:1.3rem;color:var(--gold);}
+/* Radio */
+.radio-group{display:flex;gap:.5rem;flex-wrap:wrap;}
+.radio-btn{padding:.4rem 1rem;border:1.5px solid var(--border);border-radius:5px;font-size:.85rem;cursor:pointer;background:var(--white);color:var(--text);font-family:'Source Sans 3',sans-serif;transition:all .15s;user-select:none;}
+.radio-btn.selected{background:var(--navy);border-color:var(--navy);color:var(--white);}
+hr.div{border:none;border-top:1px solid var(--border);margin:1.1rem 0;}
+/* Repeat tables */
+.repeat-table{width:100%;border-collapse:collapse;margin-top:.5rem;}
+.repeat-table th{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--slate);padding:0 .4rem .45rem;text-align:left;}
+.repeat-table td{padding:.25rem .3rem;vertical-align:top;}
+.repeat-table input,.repeat-table select{font-size:.85rem;padding:.4rem .55rem;}
+.add-row-btn{margin-top:.6rem;background:none;border:1.5px dashed var(--border);color:var(--slate);padding:.35rem .9rem;border-radius:5px;font-size:.78rem;cursor:pointer;font-family:'Source Sans 3',sans-serif;transition:border-color .2s,color .2s;}
+.add-row-btn:hover{border-color:var(--gold);color:var(--gold);}
+.remove-btn{background:none;border:none;color:#ccc;cursor:pointer;font-size:1rem;padding:.35rem .3rem;line-height:1;transition:color .2s;}
+.remove-btn:hover{color:var(--error);}
+.warn-box{background:var(--warn-bg);border:1px solid var(--warn-border);border-radius:5px;padding:.7rem .9rem;font-size:.8rem;color:#78350f;margin-bottom:1rem;line-height:1.55;}
+/* Nav */
+.nav-bar{display:flex;align-items:center;gap:.6rem;padding:0 1.5rem 1.25rem;flex-wrap:wrap;}
+.btn{padding:.55rem 1.3rem;border-radius:5px;font-family:'Source Sans 3',sans-serif;font-size:.88rem;font-weight:600;cursor:pointer;transition:all .18s;border:none;letter-spacing:.015em;white-space:nowrap;}
+.btn-primary{background:var(--navy);color:var(--white);}
+.btn-primary:hover{background:var(--navy-light);}
+.btn-secondary{background:transparent;color:var(--slate);border:1.5px solid var(--border);}
+.btn-secondary:hover{border-color:var(--slate);color:var(--text);}
+.btn-gold{background:var(--gold);color:var(--navy);}
+.btn-gold:hover{background:var(--gold-light);}
+.btn-review{background:#e8f0e8;color:#1a4a1a;border:1.5px solid #b5d4b5;font-size:.82rem;padding:.55rem .9rem;}
+.btn-review:hover{background:#d4e8d4;}
+.nav-spacer{flex:1;}
+/* Review */
+.review-sec{margin-bottom:1.4rem;}
+.review-sec-hdr{display:flex;align-items:center;justify-content:space-between;padding-bottom:.4rem;border-bottom:2px solid var(--border);margin-bottom:.55rem;}
+.review-sec-hdr h3{font-family:'Playfair Display',serif;font-size:.95rem;color:var(--navy);}
+.edit-sec-btn{font-size:.75rem;background:none;border:1px solid var(--border);border-radius:4px;color:var(--slate);cursor:pointer;padding:.2rem .6rem;font-family:'Source Sans 3',sans-serif;transition:all .15s;}
+.edit-sec-btn:hover{border-color:var(--navy);color:var(--navy);}
+.review-table{width:100%;border-collapse:collapse;font-size:.82rem;}
+.review-table th{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--slate);padding:.2rem .5rem .4rem;text-align:left;border-bottom:1px solid var(--border);}
+.review-table th.you-th{color:var(--navy);}
+.review-table th.sp-th{color:#7a5c1e;}
+.review-table td{padding:.22rem .5rem;color:var(--text);border-bottom:1px solid #f0ece4;}
+.review-table td.label-td{color:var(--text-light);width:45%;}
+.review-table tr:last-child td{border-bottom:none;}
+.success-screen{text-align:center;padding:4rem 1.5rem;display:none;}
+.success-screen.active{display:block;}
+.success-icon{width:60px;height:60px;background:var(--navy);border-radius:50%;margin:0 auto 1.2rem;display:flex;align-items:center;justify-content:center;font-size:1.6rem;color:var(--gold);}
+.success-screen h2{font-family:'Playfair Display',serif;font-size:1.5rem;color:var(--navy);margin-bottom:.65rem;}
+.success-screen p{color:var(--text-light);font-size:.9rem;max-width:400px;margin:0 auto 1.5rem;line-height:1.6;}
+@media(max-width:580px){
+  .person-grid{grid-template-columns:130px 1fr 1fr;}
+  .person-grid.single-col{grid-template-columns:130px 1fr;}
+  header{padding:1rem 1rem .75rem;}
+  .container{padding:1.25rem .75rem 4rem;}
+  .section-body{padding:1rem;}
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     INSTRUCTION TEXT — edit freely.
+     This is the single place where ALL question instructions live.
+     Keys match question numbers (e.g. "1a", "2c", "10g").
+     'short' = the hint always visible below each field.
+     'long'  = the full text shown when the user clicks ▶ More info.
+     Leave 'long' as an empty string "" to omit the More info button.
+═══════════════════════════════════════════════════════════════ -->
+<script>
+const INSTR = {
+
+  // ── Section 0: Getting Started ──────────────────────────────
+  "0a": {
+    short: "The form uses this as a reference point for salary history, savings dates, and other time-sensitive calculations.  Please correct it if it does not show the current year.",
+    long:  ""
+  },
+  "0b": {
+    short: "Select whether you are completing this analysis for one person or as a couple.",
+    long:  ""
+  },
+
+  // ── Section 1: Individual Data ───────────────────────────────
+  "1a": {
+    short: "Enter your first name or initials, and those of your spouse if applicable.  These will be used throughout the questionnaire.",
+    long:  ""
+  },
+  "1b": {
+    short: "Enter your age as of December 31 of the current year.",
+    long:  ""
+  },
+  "1c": {
+    short: "Answer Yes or No for each person.",
+    long:  "This response is used to determine eligibility for the Social Security supplement."
+  },
+  "1d": {
+    short: "Indicate whether each person is currently working or already retired.  If you worked more than half of the current year, select Employed.",
+    long:  ""
+  },
+  "1e": {
+    short: "The official federal start date used to calculate length of service.  Leave blank if not a federal employee.",
+    long:  "For U.S. government workers, your Service Computation Date (SCD) can be found on your SF50 (box 31), your employee profile, or your Earnings and Leave statements.\n\nFor non-U.S. government workers: Please enter the date you began working at your current job.\n\nTip: If you cannot find your SCD, subtract the number of years and months you have worked from the present date.  For example, if today is March 5, 2025, and you have worked 17 years and 5 months, your SCD would be November 5, 2007."
+  },
+
+  // ── Section 2: Working Income & Retirement Details ───────────
+  "2a": {
+    short: "If employed: Enter your current annual gross (before-tax) salary, plus the two prior years.",
+    long:  "This information is used to compute your high-three salary estimate."
+  },
+  "2b": {
+    short: "Your net pay per period, after ALL deductions (i.e., taxes, TSP, health care, etc.).",
+    long:  "Enter here your take-home pay each pay period — i.e., after all payroll deductions for taxes, Social Security, life insurance, health care, TSP, etc.\n\nNote: For those overseas in the Foreign Service, do NOT include post allowance here.  Post allowance can be added later under Expenses and Windfalls."
+  },
+  "2c": {
+    short: "How often you are paid.",
+    long:  ""
+  },
+  "2d": {
+    short: "Enter here any additional regular annual income or loss not captured above (after taxes).  Use a negative number for losses.  Do NOT include interest or investment income.",
+    long:  "This entry can be used to record regular income or losses not captured in your salary -- for instance,\n\n• Income from rental properties\n• Tax refund or payment due\n• Flexible spending account contributions\n• Alimony paid\n\nOnly recurring income or losses should be entered here.  You will have the opportunity to enter one-time payments or losses later, under Expenses and Windfalls.\n\nOnce more, do NOT include interest/dividends, which are calculated separately.\n\nNote: Amount entered here should be after taxes."
+  },
+  "2e": {
+    short: "How much do you expect your annual salary to increase annually?",
+    long:  "Enter an estimate of the percentage by which you expect your salary to increase annually.  This can include COLAs, step increases, and promotions.\n\nAs a rough guide:\n\n• If you are at the federal pay cap, choose: ~1.5%\n• If you are well under the cap, you can chose up to: ~5%\n• If you are close to the cap, you might choose: ~3%\n\nThe analysis suggests a default of 2.5%/n/nNote: Do not include inflation in this; this is calculated automatically in the analysis."
+  },
+  "2f_emp": {
+    short: "Enter here your spouse's current annual gross salary, plus the two prior years.",
+    long:  "Prior years are used to compute high-three estimates."
+  },
+  "2f_ret": {
+    short: "Enter the date your spouse retired.",
+    long:  "If you don't know it precisely, just estimate."
+  },
+  "2g_emp": {
+    short: "Your spouse's net pay per period, after ALL deductions (i.e., taxes, TSP, health care, etc.).",
+    long:  "Enter here your take-home pay each pay period — i.e., after all payroll deductions for taxes, Social Security, life insurance, health care, TSP, etc.\n\nNote: For those overseas in the Foreign Service, do NOT include post allowance here.  Post allowance can be added later under Expenses and Windfalls."
+  },
+  "2g_ret": {
+    short: "Is your spouse already receiving pension payments?",
+    long:  ""
+  },
+  "2h_emp": {
+    short: "How often your spouse is paid.",
+    long:  ""
+  },
+  "2h_ret": {
+    short: "Enter the gross MONTHLY pension amount currently being received.",
+    long:  ""
+  },
+  "2i_emp": {
+    short: "Enter here any additional regular annual income or loss not captured above (after taxes).  Use a negative number for losses.  Do NOT include interest or investment income.",
+    long:  "This entry can be used to record regular income or losses not captured in your salary -- for instance,\n\n• Income from rental properties\n• Tax refund or payment due\n• Flexible spending account contributions\n• Alimony paid\n\nOnly recurring income or losses should be entered here.  You will have the opportunity to enter one-time payments or losses later, under Expenses and Windfalls.\n\nOnce more, do NOT include interest/dividends, which are calculated separately.\n\nNote: Amount entered here should be after taxes."
+  },
+  "2i_ret": {
+    short: "These figures are used for pension calculation purposes.",
+    long:  "Enter your spouse's gross salary for the year they retired and the two prior years.  These figures are used for pension calculation purposes."
+  },
+  "2j": {
+    short: "How much do you expect your spouse's annual salary to increase annually?",
+    long:  "Enter an estimate of the percentage by which you expect your spouse's salary to increase annually.  This can include COLAs, step increases, and promotions.\n\nAs a rough guide:/n/n• If you are at the federal pay cap, choose: ~1.5%\n• If you are well under the cap, you can chose up to: ~5%\n• If you are close to the cap, you might choose: ~3%\n\nThe analysis suggests a default of 2.5%/n/nNote: Do not include inflation in this; this is calculated automatically in the analysis."
+  },
+  "2_ret_date": {
+    short: "Enter the date you retired.",
+    long:  "If you don't know it precisely, just estimate."
+  },
+  "2i_ret_you": {
+    short: "These figures are used for pension calculation purposes.",
+    long:  "Enter your gross salary for the year you retired and the two prior years.  These figures are used for pension calculation purposes."
+  },
+  "2_ret_pension_q": {
+    short: "Are you already receiving pension payments?",
+    long:  ""
+  },
+  "2_ret_pen_amt": {
+    short: "Enter the gross MONTHLY pension amount currently being received.",
+    long:  ""
+  },
+
+  // ── Section 3: Retirement Income ────────────────────────────
+  "3a": {
+    short: "Select the federal retirement system that applies to each person's pension.",
+    long:  "• FSPS — Foreign Service Pension System\n• FERS — Federal Employees Retirement System\n• CSRS — Civil Service Retirement System\n• Other — any non-federal pension\n• None — no pension"
+  },
+  "3b": {
+    short: "If you elected to have a survivor benefit for your annuity, indicate the percentage here.",
+    long:  "Options: 50%, 25%, or 0% (no survivor benefit)."
+  },
+  "3c": {
+    short: "Annual amount from any non-federal pension, starting the year you retire.  Leave blank if none.",
+    long:  "If you are eligible for a non-USG pension plan, list here the amount you expect to receive the first year after you retire.\n\nLeave empty if you have only a government pension or no pension.\n\nNote: The program assumes pension payouts are adjusted by a COLA."
+  },
+  "3d": {
+    short: "Enter here your planned social security start age.  67 is strongly recommended to maximize efficiency of the model.",
+    long:  ""
+  },
+  "3e": {
+    short: "Enter here your expected MONTHLY social security payouts at the following ages.  You can find these on your SSA statement at ssa.gov.",
+    long:  "Enter your projected MONTHLY Social Security benefit at ages 70, 67, 64, and 62.  The model will multiply by 12 to get annual figures.\n\nYou can find these figures on your Social Security statement at ssa.gov.\n\nNote: If pressed, you only need to enter the figures for 67 and 62.  The latter is needed to compute the Foreign Service Annuity Supplement."
+  },
+  "3f": {
+    short: "The year your Social Security figures are based on.  Almost always the current year.",
+    long:  "This is the year in which the above Social Security values were determined.  Ordinarily it will be the current year, but you may only have an older statement, so you have the option of choosing a prior year.\n\nNote: This is needed as a base value for calculating future SS COLAs."
+  },
+
+  // ── Section 4: Savings ───────────────────────────────────────
+  "4a": {
+    short: "Are you enrolled in the federal Thrift Savings Plan?",
+    long:  ""
+  },
+  "4b": {
+    short: "Enter your TSP balance as of December 31 of last year.",
+    long:  "The analysis functions in full-year increments, so we try to gather data as of Dec. 31.  But don't stress if you only have the current value.  You can just enter that."
+  },
+  "4c": {
+    short: "Enter the total TSP contribution you expect to make this calendar year.  LEAVE BLANK IF RETIRED.",
+    long:  "Only the employed spouse should fill this out."
+  },
+  "4d": {
+    short: "Enter the TSP amount you plan to contribute each year going forward.",
+    long:  "Once again, only the EMPLOYED spouse should fill this out.  Enter the total TSP contribution you expect to make in future years.  This can be the same as the current year, or you can adjust it."
+  },
+  "4e": {
+    short: "Indicate here whether you intend to increase your TSP contribution in future years to the maximum allowable.",
+    long:  "If you select this option, the model will automatically adjust the total upward based on an estimate of IRS allowable increases in future years."
+  },
+  "4f": {
+    short: "Enter here any balances from non-TSP retirement accounts.",
+    long:  "Theyse can include individual IRAs, 401(k) plans, or other accounts.\n\nNote: The current model assumes all IRAs are traditional, not Roth, and has them performing similarly to the TSP.  Future models may adjust this."
+  },
+  "4g": {
+    short: "Enter here all assets as of Dec. 31 last year, per person.  Do NOT include college savings (529 accounts) — those will be entered later.",
+    long:  "Estimate if you do not know precise amounts.  If accounts are held jointly, enter under either spouse -- it doesn't matter which.\n\nThe model asks about December 31 balances because it works in annual increments, but don't stress about it -- you can enter today's numbers if you like, and it will have very little effect on the analysis.\n\nNote: Do NOT list savings for college that you have in 529 or other dedicated accounts — these are entered separately later in the questionnaire."
+  },
+
+  // ── Section 5: Spending Needs ────────────────────────────────
+  "5a": {
+    short: "To estimate typical expenditures, enter here the total amount your household spent over the past 12 months — include all expenses EXCEPT payroll deductions.",
+    long:  "Enter here the amount of money you spent over the past 12 months.  Do not include any payroll deductions.\n\nThe most fastidious way of doing this is to examine your bank account month by month to look at your specific expenditures.\n\nBut a quicker estimate can be arrived at by looking at the difference in your savings from one year to the next, after factoring out income (take-home pay), interest, dividends, capital gains. — over the past year (not including interest/dividends), then subtracting this from your take-home income."
+  },
+  "5b": {
+    short: "Here you can make adjustments to the figure above to reflect a 'typical' year.",
+    long:  "If any of the income or expenses you computed in 4A, above, were extraordinary or unusual — for example, a car purchase — you can control for those here.  A positive number will adjust your average expenditure upward.  A negative number will adjust your average expenditure downward."
+  },
+  "5c": {
+    short: "Estimate your annual household needs while employed.  The default value is based on your responses to 5A and 5B, but you can override it.",
+    long:  "This is an estimate of your annual household spending while you are still working.  The default value is calculated from your answers to 5A and 5B.  You may override it if you feel a different figure is more accurate.  This estimate is meant to be an annual average.  (The model will adjust it based on inflation, so you you should use current dollars.)  You will have an opportunity to enter expected ONE-TIME windfalls or expenses later."
+  },
+  "5d": {
+    short: "Estimate how much your spending patterns are likely to CHANGE in retirement.  If you expect to spend less than you did when employed, enter a negative number.",
+    long:  "You can estimate here how much your expenitures will grow or shrink in retirement.\n\nYou might, for instance, save money by no longer paying for\n\n• Work lunches\n• commuting\n• professional expenses\n• etc.\n\nOr your expenditures may increase if you plan on traveling more or moving to a more expensive city.  Again, this should be an average estimate."
+  },
+  "5e": {
+    short: "Estimate your annual household needs while retired.  The default value is based on your responses to 5C and 5D, but you can override it.",
+    long:  "This is an estimate of your annual spending in retirement.  The default value is calculated from your answers to 5C and 5D.  You may override it if you feel a different figure is more accurate."
+  },
+
+  // ── Section 6: Mortgage, Expenses & Taxes ───────────────────
+  "6a": {
+    short: "The year your mortgage will be fully paid off.  Leave blank if you have no mortgage.",
+    long:  "Enter here the year you will pay off your mortgage.  Leave blank if you have no mortgage.\n\nSpecifying the payoff year will automatically reduce your projected future expenses at that point."
+  },
+  "6b": {
+    short: "Enter principal and interest only — do not include insurance or property taxes.",
+    long:  "Enter here the amount you pay monthly in principal and interest on your mortgage.\n\nDo NOT include homeowner's insurance or property taxes — those are already captured in your spending needs figure.\n\nIf you do not own a home, leave blank.  Rental expenditures are captured in expenses in the previous section."
+  },
+  "6c": {
+    short: "Enter here a rough percentage of income paid in state and local taxes.  Virginia and Maryland are approximately 8%.  Federal taxes are handled separately.",
+    long:  "You can get a decent estimate of this by simply dividing the amount you paid in total taxes last year by your full income (not AGI)."
+  },
+  "6d": {
+    short: "In the blanks below, enter large one-time items in specific future years.  Use negative amounts for expenses; positive for windfalls.  Do NOT include college costs.",
+    long:  "List any expenditures or additions to savings you are expecting in specific future years.  All amounts should be AFTER TAXES.  Use a minus sign for expenses.\n\nExamples of potential future expenses:\n• a new vehicle\n• the purchase of a vacation home\n• a major trip.\n\nExamples of windfalls:\n• an inheritance\n• a bonus\n• post allowance if posted overseas\n• or rental income while posted overseas (if you did not enter it earlier).\n\nNote: Do NOT include college expenses here — those are entered separately."
+  },
+  
+
+  // ── Section 7: Future Work ───────────────────────────────────
+  "7a": {
+    short: "Enter here optional income from a second career or part-time work after your primary retirement.",
+    long:  "If you are considering working past the retirement date of your initial job, please indicate your expected annual salary here (pre-tax).  This amount will be adjusted upward annually based on COLA calculations."
+  },
+  "7b": {
+    short: "Enter here the first and last year of the future work period.",
+    long:  ""
+  },
+
+  // ── Section 8: College ───────────────────────────────────────
+  "8a": {
+    short: "Enter one row per child for whom you expect to pay college costs.",
+    long:  "Child's name: Name of child for whom you expect to pay college costs.\n\nYear start: The year each child begins college.  Can be a past year if currently enrolled.\n\nAnnual tuition: CURRENT annual cost including tuition, fees, room, and board.  The model projects future costs.\n\nCollege savings: The amount you have in dedicated college savings (e.g. 529 accounts) for this child.  You should not have included this amount in your previous savings estimates."
+  },
+
+  // ── Section 9: Retirement Age Tests ─────────────────────────
+  "9a": {
+    short: "Enter the retirement ages you'd like to model for your and (if applicable) your spouse/partner.  You may enter up to four sets of ages.  If a spouse is already retired, that is marked.",
+    long:  "This is the heart of the analysis.  Enter up to four sets of prospective retirement ages.  Based on the other data you have provided, the program will run hundreds of simulations to make probabilistic estimates of how long into retirement your money will last.\n\nFeel free to experiment: choose younger ages in Test 1 and older ages in Test 2, for example.  If both spouses are already retired, the model will use your existing information as the basis for analysis.\n\nIn the Inheritance column, indicate the amount you wish to leave to your children or others.  You may wish to keep this value constant across tests so you can compare results."
+  },
+  "9b": {
+    short: "Enter here the amount you wish to leave to your children or others.  The program will estimate when your savings drop to this number.",
+    long:  ""
+  },
+
+  // ── Section 10: Economic Variables ──────────────────────────
+  "10a": {
+    short: "Expected average annual return on TSP portfolio (not counting contributions).  Default: 6%.",
+    long:  "This is a prediction of the average percentage increase of your TSP portfolio over time.  This does not include contributions — simply the increase in investment value.\n\nOver time the TSP has returned upwards of 7%.  The default is a modestly conservative 6%."
+  },
+  "10b": {
+    short: "Expected average annual return on stocks and mutual funds.  Default: 8%.",
+    long:  "Over the last 50 years the S&P 500 has had an average annual return of over 10%.  The default is a reasonably conservative 8%.\n\nNote: This number is pre-inflation; that is calculated separately."
+  },
+  "10c": {
+    short: "Expected average annual return on bond holdings.  Default: 5%.",
+    long:  "The average historical return over the past 50 years is over 8%, but the default here is a conservative 5%."
+  },
+  "10d": {
+    short: "Expected annual yield on savings accounts.  Default: 3.5%.",
+    long:  "The historical average over the past 50 years is over 4%, but this figure may vary widely."
+  },
+  "10e": {
+    short: "Expected annual yield on checking accounts.  Default: 0%.",
+    long:  "This is typically zero or near zero."
+  },
+  "10f": {
+    short: "Expected annual yield on any other savings not categorized above.  Default: 0%.",
+    long:  "List here any assets not included above.  Do not include college savings."
+  },
+  "10g": {
+    short: "Expected average annual inflation.  Default 3.3%.",
+    long:  "The default here is slightly high, resulting in a fairly conservative calculation.\n\nHistorical averages (as of 2021):\n• 100 years: 2.8%\n• 50 years: 3.9%\n• 30 years: 2.3%\n• 10 years: 1.9%"
+  },
+  "10h": {
+    short: "Estimated annual increase in college costs.  Default: 5.66%.",
+    long:  "This is an estimate of the amount by which annual college costs (including tuition, fees, rent, meals, etc.) will increase over time.\n\nThe default is 5.66%, derived from recent publications surveying costs across universities."
+  },
+  "10i": {
+    short: "Estimated annual COLA for FSPS pension payments.  Default: 2%.",
+    long:  "An estimate of the amount by which the FSPS pension will increase over time.  This is also used as a baseline for other pension calculations.\n\nThe default is 2%, based on an analysis of historical increases."
+  },
+  "10j": {
+    short: "Estimated annual Social Security cost-of-living adjustment.  Default: 2.5%.",
+    long:  "An estimate of the annual COLA for Social Security.\n\nThe default is 2.5%, based on past data.  For historical adjustments, see: https://www.ssa.gov/oact/cola/colaseries.html"
+  }
+
+}; // ← end of INSTR — all instruction text lives above this line
+
+// ─────────────────────────────────────────────────────────────
+// renderQ(key) — call this immediately after an input/control
+// to inject the short hint and (if long text exists) the
+// expandable More info button+box for that question.
+// ─────────────────────────────────────────────────────────────
+function renderQ(key) {
+  const d = INSTR[key];
+  if (!d) return;
+  let html = '';
+  if (d.short) html += '<div class="short-hint">' + d.short + '</div>';
+  if (d.long) {
+    html += '<button class="info-toggle" id="it-' + key + '" onclick="toggleInfo(\'' + key + '\')">'
+          + '<span class="arrow">▶</span> <span class="itxt">More info</span></button>'
+          + '<div class="info-box" id="ib-' + key + '">' + d.long + '</div>';
+  }
+  // Write immediately after the current script tag
+  document.currentScript.insertAdjacentHTML('afterend', html);
+}
+
+// ═══════════════════════════════════════════
+// State
+// ═══════════════════════════════════════════
+let married = true;
+let currentYear = new Date().getFullYear();
+let youName = 'You', spName = 'Your Spouse';
+
+function isRetired(who){ return getRadio('empStatus_'+who)==='retired'; }
+function isEmployed(who){ return getRadio('empStatus_'+who)==='employed'; }
+function bothRetired(){ return isRetired('you') && (!married || isRetired('sp')); }
+function retirementYear(who){
+  const d=document.getElementById('retDate_'+who);
+  if(!d||!d.value) return currentYear;
+  return new Date(d.value+'T00:00:00').getFullYear();
+}
+
+// ═══════════════════════════════════════════
+// Helpers
+// ═══════════════════════════════════════════
+function fmtD(v){
+  if(v===''||v===null||v===undefined||isNaN(v)) return '';
+  return '$'+Number(v).toLocaleString('en-US');
+}
+function selectRadio(gid,el){
+  document.querySelectorAll('#'+gid+' .radio-btn').forEach(b=>b.classList.remove('selected'));
+  el.classList.add('selected');
+}
+function getRadio(gid){
+  const s=document.querySelector('#'+gid+' .radio-btn.selected');
+  return s?s.dataset.val:'';
+}
+function rv(id){ const e=document.getElementById(id); return e?e.value||'':''; }
+function nv(id){ const v=rv(id); return v===''?NaN:parseFloat(v); }
+function pv(id){ const v=nv(id); return isNaN(v)?'':v/100; }
+
+function toggleInfo(k){
+  const b=document.getElementById('ib-'+k), t=document.getElementById('it-'+k);
+  if(!b||!t) return;
+  const o=b.classList.toggle('open');
+  t.classList.toggle('open',o);
+  t.querySelector('.itxt').textContent=o?'Less':'More info';
+}
+
+// ═══════════════════════════════════════════
+// Spinner default pattern
+// Fields that should be grayed-out (placeholder) but snap to a
+// sensible default on first spinner interaction.
+// Call initSpinnerDefaults() after DOM ready.
+// ═══════════════════════════════════════════
+function initSpinnerDefaults(){
+  // Find all inputs with data-default attribute
+  document.querySelectorAll('input[data-default]').forEach(inp=>{
+    const def = parseFloat(inp.dataset.default);
+    if(isNaN(def)) return;
+    inp.addEventListener('input', function onFirst(){
+      // Only auto-fill if the field is still empty (i.e., spinner was clicked on empty field)
+      if(this.value===''||this.value==='0'){
+        this.value = def;
+      }
+      // Remove this listener – only fires once per field
+      this.removeEventListener('input', onFirst);
+    });
+    // Also handle mousedown on spinners (some browsers fire before input)
+    inp.addEventListener('mousedown', function(){
+      if(this.value==='') this.value=def;
+    });
+    inp.addEventListener('keydown', function(e){
+      if((e.key==='ArrowUp'||e.key==='ArrowDown')&&this.value==='') this.value=def;
+    });
+  });
+}
+
+// ═══════════════════════════════════════════
+// Dynamic year labels
+// ═══════════════════════════════════════════
+function setYearLabels(){
+  const y=currentYear;
+  document.querySelectorAll('[data-yo]').forEach(el=>{ el.textContent=(y+parseInt(el.dataset.yo)).toString(); });
+  document.querySelectorAll('[data-year-floor]').forEach(el=>{ el.min=y.toString(); });
+  const ssy=document.getElementById('ssYear');
+  if(ssy&&!ssy._userEdited) ssy.value=y;
+}
+
+function updateRetYrLabels(who){
+  const ry=retirementYear(who);
+  const pfx=who==='you'?'You':'Sp';
+  ['0','1','2'].forEach(i=>{
+    const el=document.getElementById('retYr'+pfx+'_'+i);
+    if(el) el.textContent=(ry-parseInt(i)).toString();
+  });
+}
+
+// ═══════════════════════════════════════════
+// Names
+// ═══════════════════════════════════════════
+function refreshNames(){
+  const yn=rv('nameYou').trim()||'You';
+  const sn=rv('nameSpouse').trim()||'Your Spouse';
+  youName=yn; spName=sn;
+  document.querySelectorAll('.dyn-you').forEach(el=>el.textContent=youName);
+  document.querySelectorAll('.dyn-sp').forEach(el=>el.textContent=spName);
+  // Person banners
+  const b2you=document.getElementById('banner2you');
+  if(b2you) b2you.innerHTML='<strong>'+youName+':</strong> Please answer the following questions about '+youName+'\'s '+(isRetired('you')?'retirement.':'ongoing employment.');
+  const b2sp=document.getElementById('banner2sp');
+  if(b2sp) b2sp.innerHTML='<strong>'+spName+':</strong> Please answer the following questions about '+spName+'\'s '+(isRetired('sp')?'retirement.':'ongoing employment.');
+  // Test table headers
+  const tyh=document.getElementById('testYouHdr'), tsh=document.getElementById('testSpHdr');
+  if(tyh) tyh.textContent=youName+"'s retirement age";
+  if(tsh) tsh.textContent=spName+"'s retirement age";
+}
+
+// ═══════════════════════════════════════════
+// Spending needs live computation
+// ═══════════════════════════════════════════
+function updateSpending(){
+  const outgo=nv('outgo')||0;
+  const adj=nv('needsAdj')||0;
+  const computed5c=outgo+adj;
+  // 5c: update placeholder and value if still tracking default
+  const inp5c=document.getElementById('need5c');
+  if(inp5c){
+    inp5c.placeholder='e.g. '+fmtD(computed5c).replace('$','');
+    if(inp5c._useDefault){
+      inp5c.value='';
+      inp5c.dataset.default=computed5c;
+    }
+  }
+  const v5c=inp5c&&rv('need5c')!==''?nv('need5c'):computed5c;
+  // 5e
+  const ret=nv('retReductions')||0;
+  const computed5e=v5c+ret;
+  const inp5e=document.getElementById('need5e');
+  if(inp5e){
+    inp5e.placeholder='e.g. '+fmtD(computed5e).replace('$','');
+    if(inp5e._useDefault){
+      inp5e.value='';
+      inp5e.dataset.default=computed5e;
+    }
+  }
+}
+
+// ═══════════════════════════════════════════
+// Total savings
+// ═══════════════════════════════════════════
+function updateTotalSavings(){
+  const ids=['tspBal_you','tspBal_sp','ira_you','ira_sp',
+             'stocks_you','stocks_sp','bonds_you','bonds_sp',
+             'savingsAcct_you','savingsAcct_sp','checking_you','checking_sp',
+             'otherSav_you','otherSav_sp'];
+  let total=0;
+  ids.forEach(id=>{ const v=nv(id); if(!isNaN(v)) total+=v; });
+  const el=document.getElementById('totalSavingsDisplay');
+  if(el) el.textContent=total>0?fmtD(total):'—';
+  window._totalSavings=total;
+}
+
+// ═══════════════════════════════════════════
+// Branching
+// ═══════════════════════════════════════════
+function applyBranching(){
+  ['you','sp'].forEach(who=>{
+    const ret=isRetired(who), emp=isEmployed(who);
+    document.querySelectorAll('.emp-only-'+who).forEach(el=>el.style.display=emp?'':'none');
+    document.querySelectorAll('.ret-only-'+who).forEach(el=>el.style.display=ret?'':'none');
+    const hp=getRadio('hasPension_'+who);
+    document.querySelectorAll('.pen-yes-'+who).forEach(el=>el.style.display=(ret&&hp==='Yes')?'':'none');
+    document.querySelectorAll('.pen-no-'+who).forEach(el=>el.style.display=(ret&&hp==='No')?'':'none');
+  });
+  // Spouse columns
+  document.querySelectorAll('.sp-col').forEach(el=>el.style.display=married?'':'none');
+  document.querySelectorAll('.person-grid').forEach(g=>{
+    if(!g.classList.contains('force-single')) g.classList.toggle('single-col',!married);
+  });
+  // Section 5 skip if both retired
+  const br=bothRetired();
+  document.querySelectorAll('.working-spend-only').forEach(el=>el.style.display=br?'none':'');
+  // Section 9 both retired
+  const s9t=document.getElementById('testTableWrap'), s9n=document.getElementById('bothRetiredNote');
+  if(s9t) s9t.style.display=br?'none':'';
+  if(s9n) s9n.style.display=br?'':'none';
+  // TSP contribution block (4c/4d/4e): show if at least one person is employed
+  const tcb = document.getElementById('tspContribBlock');
+  if (tcb) tcb.style.display = (isEmployed('you') || (married && isEmployed('sp'))) ? '' : 'none';
+  document.querySelectorAll('.test-sp-cell').forEach(el=>el.style.display=married?'':'none');
+  const tsh=document.getElementById('testSpHdr');
+  if(tsh) tsh.style.display=married?'':'none';
+  refreshNames();
+}
+
+function applyMaritalStatus(){
+  married=getRadio('maritalRadio')==='married';
+  applyBranching();
+}
+
+// ═══════════════════════════════════════════
+// Navigation
+// ═══════════════════════════════════════════
+let currentSec=0;
+const LAST_SEC=11;
+
+function showSec(n){
+  document.querySelectorAll('.section-card').forEach(c=>c.classList.remove('active'));
+  const el=document.getElementById('sec'+n);
+  if(el) el.classList.add('active');
+  currentSec=n;
+  updateProgress(n);
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function updateProgress(n){
+  const pct=Math.round((n/LAST_SEC)*100);
+  document.getElementById('progressFill').style.width=pct+'%';
+  document.getElementById('progressLabel').textContent=
+    n===0?'Getting started':n===LAST_SEC?'Review':'Section '+n+' of '+(LAST_SEC-1);
+}
+function goNext(n){
+  if(n===0){
+    const cy=parseInt(rv('confirmedYear'));
+    if(cy>2020&&cy<2050) currentYear=cy;
+    applyMaritalStatus(); setYearLabels();
+  }
+  if(n===1) refreshNames();
+  // Rebuild test table on arrival at sec 9 so retirement status is current
+  if(n===8) rebuildTestRows();
+  if(n===LAST_SEC-1){ buildReview(); showSec(LAST_SEC); return; }
+  showSec(n+1);
+}
+function goPrev(n){ showSec(n-1); }
+function jumpToReview(){ refreshNames(); buildReview(); showSec(LAST_SEC); }
+function editSection(n){ document.querySelectorAll('.jump-review-btn').forEach(b=>b.style.display=''); showSec(n); }
+
+// ═══════════════════════════════════════════
+// Expenses & Windfalls
+// ═══════════════════════════════════════════
+let expCount=0; const MAX_EXP=8;
+function addExpRow(){
+  if(expCount>=MAX_EXP) return;
+  expCount++;
+  const i=expCount, tr=document.createElement('tr');
+  tr.id='expRow'+i;
+  tr.innerHTML=
+    '<td><input type="number" id="expYear'+i+'" min="'+currentYear+'" max="2090" placeholder="'+(currentYear+5)+'" style="width:82px"></td>'+
+    '<td><div style="display:flex;align-items:center;gap:.3rem"><span class="ds" style="color:var(--text-light)">$</span>'+
+    '<input type="number" id="expAmt'+i+'" placeholder="e.g. –35000" style="width:110px"></div></td>'+
+    '<td><input type="text" id="expNote'+i+'" placeholder="e.g. new car"></td>'+
+    '<td><button class="remove-btn" onclick="removeRow(\'expRow'+i+'\')">×</button></td>';
+  document.getElementById('expBody').appendChild(tr);
+  if(expCount>=MAX_EXP){ const ab=document.getElementById('addExpBtn'); if(ab) ab.style.display='none'; }
+}
+
+// ═══════════════════════════════════════════
+// College
+// ═══════════════════════════════════════════
+let colCount=0; const MAX_COL=5;
+function addColRow(){
+  if(colCount>=MAX_COL) return;
+  colCount++;
+  const i=colCount, tr=document.createElement('tr');
+  tr.id='colRow'+i;
+  tr.innerHTML=
+    '<td><input type="text" id="colName'+i+'" placeholder="Name" style="width:95px"></td>'+
+    '<td><input type="number" id="colYear'+i+'" min="1990" max="2060" placeholder="e.g. 2028" style="width:78px"></td>'+
+    '<td><div style="display:flex;align-items:center;gap:.3rem"><span style="color:var(--text-light)">$</span>'+
+    '<input type="number" id="colTuition'+i+'" placeholder="e.g. 55000" style="width:95px"></div></td>'+
+    '<td><div style="display:flex;align-items:center;gap:.3rem"><span style="color:var(--text-light)">$</span>'+
+    '<input type="number" id="colSavings'+i+'" placeholder="e.g. 0" style="width:95px"></div></td>'+
+    '<td><button class="remove-btn" onclick="removeRow(\'colRow'+i+'\')">×</button></td>';
+  document.getElementById('colBody').appendChild(tr);
+  if(colCount>=MAX_COL){ const ab=document.getElementById('addColBtn'); if(ab) ab.style.display='none'; }
+}
+
+function removeRow(id){
+  const el=document.getElementById(id); if(el) el.remove();
+  const ae=document.getElementById('addExpBtn'), ac=document.getElementById('addColBtn');
+  if(ae) ae.style.display=''; if(ac) ac.style.display='';
+}
+
+// ═══════════════════════════════════════════
+// Retirement Age Tests
+// Rebuilt each time user arrives at Section 9
+// so retirement status is accurately reflected.
+// ═══════════════════════════════════════════
+let testCount=0; const MAX_TEST=4;
+
+function rebuildTestRows(){
+  const tbody=document.getElementById('testBody');
+  if(!tbody) return;
+  // Save existing inheritance values before clearing
+  const savedInh=[];
+  for(let i=1;i<=testCount;i++){
+    savedInh.push(rv('testInh'+i)||'0');
+  }
+  tbody.innerHTML='';
+  const prevCount=Math.max(testCount,1);
+  testCount=0;
+  for(let i=0;i<prevCount;i++) addTestRow(savedInh[i]||'0');
+  // Show/hide add button
+  const ab=document.getElementById('addTestBtn');
+  if(ab) ab.style.display=testCount>=MAX_TEST?'none':'';
+}
+
+function addTestRow(inheritanceVal){
+  if(testCount>=MAX_TEST) return;
+  testCount++;
+  const i=testCount;
+  const youRet=isRetired('you');
+  const spRet=married&&isRetired('sp');
+  const inh=inheritanceVal||'0';
+
+  // Build You cell
+  let youCell;
+  if(youRet){
+    const age=rv('ageYou')||'—';
+    youCell='<td style="padding:.25rem .3rem;font-style:italic;color:var(--text-light);font-size:.85rem">Age '+age+' (retired)</td>';
+  } else {
+    youCell='<td style="padding:.25rem .3rem"><input type="number" id="testAge_you'+i+'" min="40" max="80" placeholder="e.g. 58" style="width:72px"></td>';
+  }
+
+  // Build Spouse cell
+  let spCell;
+  if(!married){
+    spCell='';
+  } else if(spRet){
+    const age=rv('ageSpouse')||'—';
+    spCell='<td class="test-sp-cell" style="padding:.25rem .3rem;font-style:italic;color:var(--text-light);font-size:.85rem">Age '+age+' (retired)</td>';
+  } else {
+    spCell='<td class="test-sp-cell" style="padding:.25rem .3rem"><input type="number" id="testAge_sp'+i+'" min="40" max="80" placeholder="e.g. 58" style="width:72px"></td>';
+  }
+
+  const removeBtnHtml=i>1?'<td><button class="remove-btn" onclick="removeTestRow('+i+')">×</button></td>':'<td></td>';
+
+  const tr=document.createElement('tr');
+  tr.id='testRow'+i;
+  tr.innerHTML=
+    '<td style="font-weight:600;color:var(--slate);font-size:.85rem;padding:.3rem .4rem 0 0">Test '+i+'</td>'+
+    youCell+spCell+
+    '<td style="padding:.25rem .3rem"><div style="display:flex;align-items:center;gap:.3rem"><span style="color:var(--text-light)">$</span>'+
+    '<input type="number" id="testInh'+i+'" min="0" value="'+inh+'" style="width:105px"></div></td>'+
+    removeBtnHtml;
+  document.getElementById('testBody').appendChild(tr);
+
+  const ab=document.getElementById('addTestBtn');
+  if(ab) ab.style.display=testCount>=MAX_TEST?'none':'';
+}
+
+function removeTestRow(i){
+  const tr=document.getElementById('testRow'+i);
+  if(tr){ tr.remove(); testCount--; }
+  const ab=document.getElementById('addTestBtn');
+  if(ab) ab.style.display='';
+}
+
+// ═══════════════════════════════════════════
+// Review builder
+// ═══════════════════════════════════════════
+function buildReview(){
+  refreshNames();
+  const yn=youName, sn=spName, y=currentYear;
+
+  function secOpen(title,n){
+    return '<div class="review-sec"><div class="review-sec-hdr"><h3>'+title+'</h3>'+
+           '<button class="edit-sec-btn" onclick="editSection('+n+')">Edit</button></div>';
+  }
+  function secClose(){ return '</div>'; }
+  function tbl(rows){
+    let h='<table class="review-table"><thead><tr><th></th><th class="you-th">'+yn+'</th>';
+    if(married) h+='<th class="sp-th">'+sn+'</th>';
+    h+='</tr></thead><tbody>';
+    rows.forEach(r=>{
+      h+='<tr><td class="label-td">'+r.label+'</td><td>'+(r.you||'—')+'</td>';
+      if(married) h+='<td>'+(r.sp||'—')+'</td>';
+      h+='</tr>';
+    });
+    return h+'</tbody></table>';
+  }
+  function stbl(rows){
+    let h='<table class="review-table"><tbody>';
+    rows.forEach(r=>{ h+='<tr><td class="label-td" style="width:55%">'+r.label+'</td><td>'+(r.val||'—')+'</td></tr>'; });
+    return h+'</tbody></table>';
+  }
+  function d(id){ const v=rv(id); return v?fmtD(parseFloat(v)):'—'; }
+  function p(id){ const v=rv(id); return v?v+'%':'—'; }
+
+  let html='';
+
+  html+=secOpen('Getting Started',0);
+  html+=stbl([{label:'Current year',val:y},{label:'Marital status',val:married?'Married / partnered':'Single'}]);
+  html+=secClose();
+
+  html+=secOpen('1. Individual Data',1);
+  html+=tbl([
+    {label:'Name',                      you:rv('nameYou'),             sp:rv('nameSpouse')},
+    {label:'Age (Dec 31, '+y+')',        you:rv('ageYou'),              sp:rv('ageSpouse')},
+    {label:'Foreign Service?',           you:getRadio('fsYouRadio'),    sp:getRadio('fsSpouseRadio')},
+    {label:'Status',                     you:getRadio('empStatus_you'), sp:getRadio('empStatus_sp')},
+    {label:'Service computation date',   you:rv('scdYou'),              sp:rv('scdSpouse')},
+  ]);
+  html+=secClose();
+
+  html+=secOpen('2. Working Income & Retirement Details',2);
+  function personIncomeBlock(who, color){
+    const label=who==='you'?yn:sn;
+    const u=who==='you'?'You':'Sp';
+    let h='<div style="font-size:.75rem;font-weight:700;color:'+color+';text-transform:uppercase;letter-spacing:.05em;margin:.4rem 0 .3rem">'+label+' — '+(isRetired(who)?'retired':'employed')+'</div>';
+    if(isEmployed(who)){
+      h+=stbl([
+        {label:'Salary '+y,             val:d('sal'+u+'_curr')},
+        {label:'Salary '+(y-1),         val:d('sal'+u+'_prev1')},
+        {label:'Salary '+(y-2),         val:d('sal'+u+'_prev2')},
+        {label:'Take-home / period',    val:d('take'+u)},
+        {label:'Pay period',            val:rv('period'+u)},
+        {label:'Income adjustments',    val:d('adj'+u)},
+        {label:'Salary annual increase',val:p('rise'+u)},
+      ]);
+    } else if(isRetired(who)){
+      const ry=retirementYear(who);
+      const pen=getRadio('hasPension_'+who);
+      h+=stbl([
+        {label:'Retirement date',   val:rv('retDate_'+who)},
+        {label:'Receiving pension?',val:pen},
+        {label:'Pension (monthly)', val:pen==='Yes'?d('penAmt_'+who):'—'},
+        {label:'Salary '+ry,        val:pen==='No'?d('salRet_'+who+'_0'):'—'},
+        {label:'Salary '+(ry-1),    val:pen==='No'?d('salRet_'+who+'_1'):'—'},
+        {label:'Salary '+(ry-2),    val:pen==='No'?d('salRet_'+who+'_2'):'—'},
+      ]);
+    }
+    return h;
+  }
+  html+=personIncomeBlock('you','var(--navy)');
+  if(married) html+=personIncomeBlock('sp','#7a5c1e');
+  html+=secClose();
+
+  html+=secOpen('3. Retirement Income',3);
+  html+=tbl([
+    {label:'Retirement system',     you:rv('retSys_you'),         sp:rv('retSys_sp')},
+    {label:'Survivor benefit',      you:rv('surv_you')?rv('surv_you')+'%':'—', sp:rv('surv_sp')?rv('surv_sp')+'%':'—'},
+    {label:'Other pension (annual)',you:d('otherPen_you'),         sp:d('otherPen_sp')},
+    {label:'SSA start age',         you:getRadio('ssaStart_you'), sp:getRadio('ssaStart_sp')},
+    {label:'Monthly SSA at 70',     you:d('ssa70_you'),           sp:d('ssa70_sp')},
+    {label:'Monthly SSA at 67',     you:d('ssa67_you'),           sp:d('ssa67_sp')},
+    {label:'Monthly SSA at 64',     you:d('ssa64_you'),           sp:d('ssa64_sp')},
+    {label:'Monthly SSA at 62',     you:d('ssa62_you'),           sp:d('ssa62_sp')},
+  ]);
+  html+=stbl([{label:'SS statement year',val:rv('ssYear')}]);
+  html+=secClose();
+
+  html+=secOpen('4. Savings',4);
+  html+=tbl([
+    {label:'TSP enrollee?',       you:getRadio('tspEnrollee_you'), sp:getRadio('tspEnrollee_sp')},
+    {label:'TSP balance',         you:d('tspBal_you'),             sp:d('tspBal_sp')},
+    {label:'TSP contrib ('+y+')', you:d('tspCon_you'),             sp:d('tspCon_sp')},
+    {label:'Annual TSP contrib',  you:d('tspAnn_you'),             sp:d('tspAnn_sp')},
+    {label:'Max out TSP?',        you:getRadio('tspMax_you'),      sp:getRadio('tspMax_sp')},
+    {label:'IRA / other ret.',    you:d('ira_you'),                sp:d('ira_sp')},
+    {label:'Stocks & funds',      you:d('stocks_you'),             sp:d('stocks_sp')},
+    {label:'Bonds',               you:d('bonds_you'),              sp:d('bonds_sp')},
+    {label:'Savings account',     you:d('savingsAcct_you'),        sp:d('savingsAcct_sp')},
+    {label:'Checking',            you:d('checking_you'),           sp:d('checking_sp')},
+    {label:'Other savings',       you:d('otherSav_you'),           sp:d('otherSav_sp')},
+  ]);
+  html+=stbl([{label:'Total savings (combined)',val:fmtD(window._totalSavings||0)}]);
+  html+=secClose();
+
+  html+=secOpen('5. Spending Needs',5);
+  if(!bothRetired()){
+    html+=stbl([
+      {label:'Outgo last 12 months',   val:d('outgo')},
+      {label:'Adjustments',            val:d('needsAdj')},
+      {label:'Budget while employed',  val:d('need5c')},
+    ]);
+  }
+  html+=stbl([
+    {label:'Spending changes in retirement',val:d('retReductions')},
+    {label:'Budget in retirement',          val:d('need5e')},
+  ]);
+  html+=secClose();
+
+  html+=secOpen('6. Mortgage, Expenses & Taxes',6);
+  html+=stbl([
+    {label:'Mortgage payoff year', val:rv('mortYear')},
+    {label:'Monthly P&I',         val:d('mortAmt')},
+    {label:'State & local tax rate',val:p('taxRate')},
+  ]);
+  let expRows=[];
+  for(let i=1;i<=MAX_EXP;i++){
+    const ey=document.getElementById('expYear'+i);
+    if(ey&&ey.value){ const note=rv('expNote'+i); expRows.push({label:ey.value+(note?' – '+note:''),val:fmtD(parseFloat(rv('expAmt'+i)))}); }
+  }
+  if(expRows.length) html+=stbl(expRows);
+  html+=secClose();
+
+  html+=secOpen('7. Future Work',7);
+  html+=tbl([
+    {label:'Future annual income', you:d('futInc_you'), sp:d('futInc_sp')},
+    {label:'Start year',           you:rv('futStart_you'),sp:rv('futStart_sp')},
+    {label:'End year',             you:rv('futEnd_you'),  sp:rv('futEnd_sp')},
+  ]);
+  html+=secClose();
+
+  html+=secOpen('8. College Costs',8);
+  let colRows=[];
+  for(let i=1;i<=MAX_COL;i++){
+    const cn=document.getElementById('colName'+i);
+    if(cn&&cn.value) colRows.push({label:cn.value,val:'Start '+(rv('colYear'+i)||'—')+', '+fmtD(parseFloat(rv('colTuition'+i)))+'/yr, '+fmtD(parseFloat(rv('colSavings'+i)))+' saved'});
+  }
+  html+=stbl(colRows.length?colRows:[{label:'Entries',val:'None'}]);
+  html+=secClose();
+
+  html+=secOpen('9. Retirement Age Tests',9);
+  if(bothRetired()){
+    html+=stbl([{label:'Both retired — single projection',val:yn+' age '+rv('ageYou')+(married?', '+sn+' age '+rv('ageSpouse'):'')}]);
+  } else {
+    let testRows=[];
+    for(let i=1;i<=testCount;i++){
+      const youRet=isRetired('you'), spRet=married&&isRetired('sp');
+      const youVal=youRet?'Age '+rv('ageYou')+' (retired)':(rv('testAge_you'+i)?'Age '+rv('testAge_you'+i):'—');
+      const spVal=spRet?'Age '+rv('ageSpouse')+' (retired)':(married&&rv('testAge_sp'+i)?'Age '+rv('testAge_sp'+i):'—');
+      const inh=rv('testInh'+i);
+      const line='Test '+i+' — '+yn+': '+youVal+(married?', '+sn+': '+spVal:'');
+      testRows.push({label:line,val:'Inheritance: '+(inh&&inh!=='0'?fmtD(parseFloat(inh)):'—')});
+    }
+    html+=stbl(testRows.length?testRows:[{label:'Entries',val:'None'}]);
+  }
+  html+=secClose();
+
+  html+=secOpen('10. Economic Variables',10);
+  html+=stbl([
+    {label:'TSP return',            val:p('retTSP')},
+    {label:'Stocks return',         val:p('retStocks')},
+    {label:'Bonds return',          val:p('retBonds')},
+    {label:'Savings return',        val:p('retSavings')},
+    {label:'Checking return',       val:p('retChecking')},
+    {label:'Other return',          val:p('retOther')},
+    {label:'Inflation',             val:p('inflation')},
+    {label:'College cost increase', val:p('collegeInc')},
+    {label:'FSPS COLA',             val:p('fspsCola')},
+    {label:'SS COLA',               val:p('ssCola')},
+  ]);
+  html+=secClose();
+
+  document.getElementById('reviewBody').innerHTML=html;
+}
+
+// ═══════════════════════════════════════════
+// XLSX export
+// ═══════════════════════════════════════════
+function generateXLSX(){
+  refreshNames();
+  const wb=XLSX.utils.book_new(), ws={};
+  const range={s:{r:0,c:0},e:{r:80,c:11}};
+  function cell(addr,val){
+    if(val===''||val===undefined||val===null||val!==val) return;
+    ws[addr]=typeof val==='number'?{v:val,t:'n'}:val instanceof Date?{v:val,t:'d',z:'yyyy-mm-dd'}:{v:val,t:'s'};
+  }
+  function n(id){ const v=rv(id); return v===''?NaN:parseFloat(v); }
+  function p(id){ const v=n(id); return isNaN(v)?NaN:v/100; }
+  function dateV(id){ const e=document.getElementById(id); if(!e||!e.value) return null; return new Date(e.value+'T00:00:00'); }
+  function cn(addr,id){ const v=n(id); if(!isNaN(v)) cell(addr,v); }
+  function cp(addr,id){ const v=p(id); if(!isNaN(v)) cell(addr,v); }
+  function col(who){ return who==='you'?'B':'C'; }
+
+  // 1. Individual data
+  cell('B6',rv('nameYou'));   if(married) cell('C6',rv('nameSpouse'));
+  cn('B7','ageYou');          if(married) cn('C7','ageSpouse');
+  cell('B8',getRadio('fsYouRadio')); if(married) cell('C8',getRadio('fsSpouseRadio'));
+  cell('B9',getRadio('empStatus_you')); if(married) cell('C9',getRadio('empStatus_sp'));
+  const scdY=dateV('scdYou'); if(scdY) cell('B11',scdY);
+  if(married){ const scdS=dateV('scdSpouse'); if(scdS) cell('C11',scdS); }
+
+  // 2. Income
+  function writeEmployed(who){
+    const c=col(who), u=who==='you'?'You':'Sp';
+    cn(c+'16','sal'+u+'_curr'); cn(c+'17','sal'+u+'_prev1'); cn(c+'18','sal'+u+'_prev2');
+    cn(c+'20','take'+u); cell(c+'21',rv('period'+u));
+    cn(c+'23','adj'+u); cp(c+'25','rise'+u);
+  }
+  function writeRetired(who){
+    const c=col(who);
+    const rd=dateV('retDate_'+who); if(rd) cell(c+'35',rd);
+    const hp=getRadio('hasPension_'+who); cell(c+'36',hp);
+    if(hp==='Yes'){ const m=n('penAmt_'+who); if(!isNaN(m)) cell(c+'38',m*12); }
+    else if(hp==='No'){ cn(c+'40','salRet_'+who+'_0'); cn(c+'41','salRet_'+who+'_1'); cn(c+'42','salRet_'+who+'_2'); }
+  }
+  if(isEmployed('you')) writeEmployed('you'); else if(isRetired('you')) writeRetired('you');
+  if(married){ if(isEmployed('sp')) writeEmployed('sp'); else if(isRetired('sp')) writeRetired('sp'); }
+
+  // 3. Retirement income
+  cell('B29',rv('retSys_you')); if(married) cell('C29',rv('retSys_sp'));
+  const sy=rv('surv_you'); if(sy!=='') cell('B30',parseFloat(sy)/100);
+  if(married){ const ss=rv('surv_sp'); if(ss!=='') cell('C30',parseFloat(ss)/100); }
+  cn('B31','otherPen_you'); if(married) cn('C31','otherPen_sp');
+  function writeSSA(who){
+    const c=col(who);
+    cell(c+'68',parseInt(getRadio('ssaStart_'+who))||67);
+    ['70','67','64','62'].forEach((age,idx)=>{
+      const m=n('ssa'+age+'_'+who); if(!isNaN(m)) cell(c+(68+idx+1).toString(),m*12);
+    });
+    // Correct row mapping: 69=@70, 70=@67, 71=@64, 72=@62
+    // Already done above but let me be explicit:
+    const m70=n('ssa70_'+who),m67=n('ssa67_'+who),m64=n('ssa64_'+who),m62=n('ssa62_'+who);
+    if(!isNaN(m70)) cell(c+'69',m70*12);
+    if(!isNaN(m67)) cell(c+'70',m67*12);
+    if(!isNaN(m64)) cell(c+'71',m64*12);
+    if(!isNaN(m62)) cell(c+'72',m62*12);
+  }
+  writeSSA('you'); if(married) writeSSA('sp');
+  cn('B74','ssYear');
+
+  // 4. Savings
+  cell('B52',getRadio('tspEnrollee_you')); if(married) cell('C52',getRadio('tspEnrollee_sp'));
+  cn('B53','tspBal_you'); if(married) cn('C53','tspBal_sp');
+  if(isEmployed('you')){ cn('B54','tspCon_you'); cn('B55','tspAnn_you'); cell('B56',getRadio('tspMax_you')); }
+  if(married&&isEmployed('sp')){ cn('C54','tspCon_sp'); cn('C55','tspAnn_sp'); cell('C56',getRadio('tspMax_sp')); }
+  cn('B57','ira_you'); if(married) cn('C57','ira_sp');
+  cn('B60','stocks_you');      if(married) cn('C60','stocks_sp');
+  cn('B61','bonds_you');       if(married) cn('C61','bonds_sp');
+  cn('B62','savingsAcct_you'); if(married) cn('C62','savingsAcct_sp');
+  cn('B63','checking_you');    if(married) cn('C63','checking_sp');
+  cn('B64','otherSav_you');    if(married) cn('C64','otherSav_sp');
+
+  // 5. Spending
+  if(!bothRetired()){ cn('F5','outgo'); cn('F6','needsAdj'); cn('F7','need5c'); }
+  cn('F10','retReductions'); cn('F11','need5e');
+
+  // 6. Mortgage, taxes, expenses
+  cn('F14','mortYear'); cn('F15','mortAmt'); cp('F18','taxRate');
+  const expSlots=[['E23','F23','H23'],['E24','F24','H24'],['E25','F25','H25'],['E26','F26','H26'],
+                  ['E27','F27','H27'],['E28','F28','H28'],['E29','F29','H29'],['E30','F30','H30']];
+  let ei=0;
+  for(let i=1;i<=MAX_EXP;i++){
+    const el=document.getElementById('expYear'+i);
+    if(!el||!el.value) continue;
+    if(ei>=expSlots.length) break;
+    const [eY,eA,eN]=expSlots[ei];
+    cn(eY,'expYear'+i); cn(eA,'expAmt'+i); cell(eN,rv('expNote'+i));
+    ei++;
+  }
+
+  // 7. Future work
+  cn('B45','futInc_you'); if(married) cn('C45','futInc_sp');
+  cn('B46','futStart_you'); if(married) cn('C46','futStart_sp');
+  cn('B47','futEnd_you'); if(married) cn('C47','futEnd_sp');
+
+  // 8. College
+  const colSlots=[['H6','I6','J6','K6'],['H7','I7','J7','K7'],['H8','I8','J8','K8'],['H9','I9','J9','K9'],['H10','I10','J10','K10']];
+  let ci=0;
+  for(let i=1;i<=MAX_COL;i++){
+    const cn2=document.getElementById('colName'+i);
+    if(!cn2||!cn2.value) continue;
+    if(ci>=colSlots.length) break;
+    const [cN,cY,cT,cS]=colSlots[ci];
+    cell(cN,cn2.value); cn(cY,'colYear'+i); cn(cT,'colTuition'+i); cn(cS,'colSavings'+i);
+    ci++;
+  }
+
+  // 9. Retirement age tests
+  const testSlots=[['I15','J15','K15'],['I16','J16','K16'],['I17','J17','K17'],['I18','J18','K18']];
+  if(bothRetired()){
+    const ay=n('ageYou'); if(!isNaN(ay)) cell('I15',ay);
+    if(married){ const as=n('ageSpouse'); if(!isNaN(as)) cell('J15',as); }
+    const inh=n('testInh1'); if(!isNaN(inh)) cell('K15',inh);
+    // Tests 2-4 intentionally left blank (VBA reads blank = stop)
+  } else {
+    for(let i=1;i<=testCount;i++){
+      const [tY,tS,tK]=testSlots[i-1];
+      if(isRetired('you')){ const a=n('ageYou'); if(!isNaN(a)) cell(tY,a); }
+      else { const a=n('testAge_you'+i); if(!isNaN(a)) cell(tY,a); }
+      if(married){
+        if(isRetired('sp')){ const a=n('ageSpouse'); if(!isNaN(a)) cell(tS,a); }
+        else { const a=n('testAge_sp'+i); if(!isNaN(a)) cell(tS,a); }
+      }
+      const inh=n('testInh'+i); if(!isNaN(inh)) cell(tK,inh);
+    }
+    // Remaining test slots left blank intentionally
+  }
+
+  // 10. Economic variables
+  cp('F37','retTSP'); cp('F38','retStocks'); cp('F39','retBonds');
+  cp('F40','retSavings'); cp('F41','retChecking'); cp('F42','retOther');
+  cp('F46','inflation'); cp('F47','collegeInc'); cp('F48','fspsCola'); cp('F49','ssCola');
+
+  ws['!ref']=XLSX.utils.encode_range(range);
+  XLSX.utils.book_append_sheet(wb,ws,'Sheet1');
+  const fname=(rv('nameYou')||'client').toLowerCase().replace(/\s+/g,'-');
+  const today=new Date().toISOString().slice(0,10);
+  XLSX.writeFile(wb,fname+'-retirement-input ('+today+').xlsx');
+  document.getElementById('mainContainer').style.display='none';
+  document.querySelector('header').style.display='none';
+  document.getElementById('successScreen').classList.add('active');
+}
+
+function startOver(){ location.reload(); }
+
+// ═══════════════════════════════════════════
+// Init
+// ═══════════════════════════════════════════
+window.addEventListener('DOMContentLoaded',()=>{
+  document.getElementById('confirmedYear').value=currentYear;
+
+  // 5c / 5e default tracking
+  const inp5c=document.getElementById('need5c');
+  if(inp5c){
+    inp5c._useDefault=true;
+    inp5c.addEventListener('input',()=>{ inp5c._useDefault=false; updateSpending(); });
+    inp5c.addEventListener('mousedown',()=>{ if(inp5c.value===''&&inp5c._useDefault){ const def=parseFloat(inp5c.dataset.default||0); if(!isNaN(def)) inp5c.value=def; } });
+    inp5c.addEventListener('keydown',(e)=>{ if((e.key==='ArrowUp'||e.key==='ArrowDown')&&inp5c.value===''&&inp5c._useDefault){ const def=parseFloat(inp5c.dataset.default||0); if(!isNaN(def)) inp5c.value=def; } });
+  }
+  const inp5e=document.getElementById('need5e');
+  if(inp5e){
+    inp5e._useDefault=true;
+    inp5e.addEventListener('input',()=>{ inp5e._useDefault=false; updateSpending(); });
+    inp5e.addEventListener('mousedown',()=>{ if(inp5e.value===''&&inp5e._useDefault){ const def=parseFloat(inp5e.dataset.default||0); if(!isNaN(def)) inp5e.value=def; } });
+    inp5e.addEventListener('keydown',(e)=>{ if((e.key==='ArrowUp'||e.key==='ArrowDown')&&inp5e.value===''&&inp5e._useDefault){ const def=parseFloat(inp5e.dataset.default||0); if(!isNaN(def)) inp5e.value=def; } });
+  }
+
+  // Spending listeners
+  ['outgo','needsAdj','retReductions','need5c'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el) el.addEventListener('input',updateSpending);
+  });
+
+  // Dollar previews for mortgage
+  [['mortAmt','prev-mortAmt']].forEach(([a,b])=>{
+    const i=document.getElementById(a),p=document.getElementById(b);
+    if(i&&p) i.addEventListener('input',()=>p.textContent=i.value?fmtD(parseFloat(i.value)):'');
+  });
+
+  // Total savings listeners
+  ['tspBal_you','tspBal_sp','ira_you','ira_sp','stocks_you','stocks_sp','bonds_you','bonds_sp',
+   'savingsAcct_you','savingsAcct_sp','checking_you','checking_sp','otherSav_you','otherSav_sp'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el) el.addEventListener('input',updateTotalSavings);
+  });
+
+  // SS year
+  const ssy=document.getElementById('ssYear');
+  if(ssy) ssy.addEventListener('change',()=>ssy._userEdited=true);
+
+  // Init spinner defaults for all data-default fields
+  initSpinnerDefaults();
+
+  // Start with one test row (rebuilt on arrival at sec 9)
+  addTestRow('0');
+
+  // Expense and college starter rows
+  addExpRow(); addExpRow(); addColRow();
+
+  applyMaritalStatus();
+  updateProgress(0);
+});
+</script>
+
+<header>
+  <h1>Retirement Forecast – Client Questionnaire</h1>
+  <p>Please answer each question carefully.  Your responses will generate a personalized data file for analysis.</p>
+  <div class="progress-wrap">
+    <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+    <span class="progress-label" id="progressLabel">Getting started</span>
+  </div>
+</header>
+
+<div class="container" id="mainContainer">
+
+<!-- ══════════════════ SEC 0: GETTING STARTED ══════════════════ -->
+<div class="section-card active" id="sec0">
+  <div class="section-header">
+    <div class="section-num">★</div>
+    <div><div class="section-title">Getting Started</div><div class="section-subtitle">A few basics before we begin</div></div>
+  </div>
+  <div class="section-body">
+    <div style="font-size:.88rem;line-height:1.7;color:var(--text);">
+
+  <div style="margin-bottom:1rem;">
+    <div style="font-family:'Playfair Display',serif;font-size:1.2rem;color:var(--navy);font-weight:600;">Retirement Forecast</div>
+    <div style="font-size:.78rem;color:var(--text-light);margin-top:.2rem;">Engine Version 5.0 &nbsp;·&nbsp; Questionnaire Version 8 &nbsp;·&nbsp; 2026-05-11</div>
+  </div>
+
+  <p style="margin-bottom:.85rem;">Thanks for your interest in the retirement forecasting model.</p>
+
+  <p style="margin-bottom:.85rem;"><strong>What this model does:</strong>  This analysis is intended to help people estimate about how long their resources will last in retirement.  For those who are still working, it can help you determine when you should retire.  For those who have already retired, it can give you some indication of whether your existing resources are sufficient.  The analysis is particularly geared toward current and former federal employees, but other clients can use it as well.</p>
+
+  <p style="margin-bottom:.85rem;"><strong>How the model works:</strong>  The model performs what's called a Monte Carlo analysis.  That is, it takes the information you input about your income, expenses, savings, and goals, along with estimates of several broad economic variables – like inflation, stock market performance, etc. – and runs repeated simulations.  You will also be asked when you retired or, if you are still working, you can choose up to four potential future retirement dates to analyze.  In each simulation, the economic variables are allowed to vary, based on an estimate of how they fluctuate in the real world.  The simulations are then analyzed to make a probabilistic estimate about your financial security.</p>
+
+  <p style="margin-bottom:.5rem;"><strong>Output:</strong>  The analysis will provide you with three values for each actual or hypothetical retirement date you select (or pair of dates, if you are completing it as a couple):</p>
+  <ul style="margin:.4rem 0 .85rem 1.4rem;">
+    <li style="margin-bottom:.4rem;">A <strong><em>very conservative estimate</em></strong> for how long your resources will last.  That is, in 95% of the simulations your resources will last at least until this age.  Put another way, this assumes very bad market conditions.</li>
+    <li style="margin-bottom:.4rem;">A <strong><em>conservative estimate</em></strong>:  In 75% of the simulations your resources will last at least until this age.  This assumes bad, but not awful, market conditions.</li>
+    <li>The <strong><em>median estimate</em></strong>:  In half the simulations your resources will last this long.</li>
+  </ul>
+
+  <p style="margin-bottom:.5rem;"><strong>Data needed from you:</strong>  In the pages that follow, you will be asked for financial information.  This includes your salary, savings, spending patterns, children's college dates and expectations, and, finally, retirement plans.  To fill this out, you may need:</p>
+  <ul style="margin:.4rem 0 .85rem 1.4rem;">
+    <li style="margin-bottom:.4rem;">An SF-50</li>
+    <li style="margin-bottom:.4rem;">Data on your expected Social Security payouts from <a href="http://www.ssa.gov" target="_blank" style="color:var(--navy);">www.ssa.gov</a>.</li>
+    <li style="margin-bottom:.4rem;">Information on your TSP holdings.</li>
+    <li>Information on your savings – specifically, what is in stocks, bonds, savings, checking, etc.</li>
+  </ul>
+
+  <p style="margin-bottom:.85rem;">Each question includes a short description, as well as a longer description if you click on the adjacent arrow.  I strongly encourage you to read all of the longer prompts to make sure you are filling out the form correctly.  Some questions may look intuitive, but may not be.  Whenever you don't have precise data, it's OK to ballpark.</p>
+
+  <p style="margin-bottom:.85rem;"><strong>Spending patterns:</strong>  The model relies heavily on an estimate of your spending needs in retirement.  But most people have only a vague idea of this amount.  What I did myself was:  over a 12-month period I looked back at my bank statements to see how much money we deposited in our main bank account (<strong><em>after payroll deductions</em></strong>), and then looked at how much we withdrew – to pay credit card balances, checks, withdrawals, etc.  This gave me a rough snapshot of our income and expenditures.</p>
+
+  <p style="margin-bottom:.85rem;"><strong>Note:</strong>  The model does not cut off at a certain age.  So it may indicate your resources will last into your 140s.  I'm afraid that does not mean <em>you</em> will last into your 140s.  But it does indicate you can rest easy about your retirement security.</p>
+
+  <p style="margin-bottom:.85rem;"><strong>Once you finish:</strong>  Once you finish the questionnaire, it will download an Excel spreadsheet.  Please email that to me at <a href="mailto:8892-retire@yahoo.com" style="color:var(--navy);">8892-retire@yahoo.com</a>.</p>
+
+  <p style="margin-bottom:.85rem;"><strong>Privacy:</strong>  The model requires information about your savings and spending, which is obviously kind of personal.  I will never offer or share this information with anyone else.</p>
+
+  <p style="margin-bottom: .85rem;"><strong>Disclaimer:</strong>  This model emerged out of a long process of working on my own finances while learning VBA coding.  I have to be clear, however, that I am <strong><em>not</em></strong> a financial advisor.  As such, I can't provide much information about how to plan your future, though I'm happy to talk about it.  <strong>So the output you receive is provided "as is" and is in no way a guarantee of your actual financial future.</strong>  Moreover, I can't warrant against any inaccuracies in the program.  But I hope it's useful to you, and I appreciate feedback to improve the model.</p>
+  
+  <p style="margin-bottom:.85rem; 0">And now on to the questionnaire!</p>
+
+</div>
+
+    <div class="q-row">
+      <div class="q-label"><span class="q-num">0a</span><span class="q-text">Please confirm the current year</span></div>
+      <input type="number" id="confirmedYear" min="2024" max="2040" style="width:110px;margin-top:.35rem">
+      <script>renderQ("0a")</script>
+    </div>
+
+    <div class="q-row">
+      <div class="q-label"><span class="q-num">0b</span><span class="q-text">Marital / partnership status</span></div>
+      <div class="radio-group" id="maritalRadio" style="margin-top:.35rem">
+        <div class="radio-btn selected" data-val="married" onclick="selectRadio('maritalRadio',this)">Married / partnered</div>
+        <div class="radio-btn" data-val="single" onclick="selectRadio('maritalRadio',this)">Single</div>
+      </div>
+      <script>renderQ("0b")</script>
+    </div>
+  </div>
+  <div class="nav-bar"><div class="nav-spacer"></div><button class="btn btn-primary" onclick="goNext(0)">Continue →</button></div>
+</div>
+
+<!-- ══════════════════ SEC 1: INDIVIDUAL DATA ══════════════════ -->
+<div class="section-card" id="sec1">
+  <div class="section-header">
+    <div class="section-num">1</div>
+    <div><div class="section-title">Individual Data</div><div class="section-subtitle">Names, ages, and federal service details</div></div>
+  </div>
+  <div class="section-body">
+
+    <!-- 1a Names -->
+    <div class="q-row">
+      <div class="q-label"><span class="q-num">1a</span><span class="q-text">Names</span></div>
+      <div class="person-grid">
+        <div class="pg-header"></div>
+        <div class="pg-header you-hdr">You</div>
+        <div class="pg-header sp-hdr sp-col">Your Spouse</div>
+        <div class="pg-label pg-row-last">First name</div>
+        <div class="pg-cell pg-row-last"><input type="text" id="nameYou" placeholder="Fred" onchange="refreshNames()"></div>
+        <div class="pg-cell pg-row-last sp-col"><input type="text" id="nameSpouse" placeholder="Wilma" onchange="refreshNames()"></div>
+      </div>
+      <script>renderQ("1a")</script>
+    </div>
+
+    <!-- 1b Age -->
+    <div class="q-row">
+      <div class="q-label"><span class="q-num">1b</span><span class="q-text">Age on December 31, <span data-yo="0">current year</span></span></div>
+      <div class="person-grid">
+        <div class="pg-header"></div>
+        <div class="pg-header you-hdr"><span class="dyn-you">You</span></div>
+        <div class="pg-header sp-hdr sp-col"><span class="dyn-sp">Your Spouse</span></div>
+        <div class="pg-label pg-row-last">Age</div>
+        <div class="pg-cell pg-row-last">
+          <input type="number" id="ageYou" min="20" max="90" placeholder="e.g. 56" data-default="56" style="width:80px">
+        </div>
+        <div class="pg-cell pg-row-last sp-col">
+          <input type="number" id="ageSpouse" min="20" max="90" placeholder="e.g. 55" data-default="55" style="width:80px">
+        </div>
+      </div>
+      <script>renderQ("1b")</script>
+    </div>
+
+    <!-- 1c Foreign Service -->
+    <div class="q-row">
+      <div class="q-label"><span class="q-num">1c</span><span class="q-text">In the Foreign Service?</span></div>
+      <div class="person-grid">
+        <div class="pg-header"></div>
+        <div class="pg-header you-hdr"><span class="dyn-you">You</span></div>
+        <div class="pg-header sp-hdr sp-col"><span class="dyn-sp">Your Spouse</span></div>
+        <div class="pg-label pg-row-last">Foreign Service?</div>
+        <div class="pg-cell pg-row-last">
+          <div class="radio-group" id="fsYouRadio">
+            <div class="radio-btn" data-val="Yes" onclick="selectRadio('fsYouRadio',this)">Yes</div>
+            <div class="radio-btn selected" data-val="No" onclick="selectRadio('fsYouRadio',this)">No</div>
+          </div>
+        </div>
+        <div class="pg-cell pg-row-last sp-col">
+          <div class="radio-group" id="fsSpouseRadio">
+            <div class="radio-btn" data-val="Yes" onclick="selectRadio('fsSpouseRadio',this)">Yes</div>
+            <div class="radio-btn selected" data-val="No" onclick="selectRadio('fsSpouseRadio',this)">No</div>
+          </div>
+        </div>
+      </div>
+      <script>renderQ("1c")</script>
+    </div>
+
+    <!-- 1d Employment status -->
+    <div class="q-row">
+      <div class="q-label"><span class="q-num">1d</span><span class="q-text">Currently employed or already retired?</span></div>
+      <div class="person-grid">
+        <div class="pg-header"></div>
+        <div class="pg-header you-hdr"><span class="dyn-you">You</span></div>
+        <div class="pg-header sp-hdr sp-col"><span class="dyn-sp">Your Spouse</span></div>
+        <div class="pg-label pg-row-last">Status</div>
+        <div class="pg-cell pg-row-last">
+          <div class="radio-group" id="empStatus_you">
+            <div class="radio-btn selected" data-val="employed" onclick="selectRadio('empStatus_you',this);applyBranching()">Employed</div>
+            <div class="radio-btn" data-val="retired" onclick="selectRadio('empStatus_you',this);applyBranching()">Retired</div>
+          </div>
+        </div>
+        <div class="pg-cell pg-row-last sp-col">
+          <div class="radio-group" id="empStatus_sp">
+            <div class="radio-btn selected" data-val="employed" onclick="selectRadio('empStatus_sp',this);applyBranching()">Employed</div>
+            <div class="radio-btn" data-val="retired" onclick="selectRadio('empStatus_sp',this);applyBranching()">Retired</div>
+          </div>
+        </div>
+      </div>
+      <script>renderQ("1d")</script>
+    </div>
+
+    <!-- 1e Service computation date -->
+    <div class="q-row">
+      <div class="q-label"><span class="q-num">1e</span><span class="q-text">Service computation date</span></div>
+      <div class="person-grid">
+        <div class="pg-header"></div>
+        <div class="pg-header you-hdr"><span class="dyn-you">You</span></div>
+        <div class="pg-header sp-hdr sp-col"><span class="dyn-sp">Your Spouse</span></div>
+        <div class="pg-label pg-row-last">Date</div>
+        <div class="pg-cell pg-row-last"><input type="date" id="scdYou"></div>
+        <div class="pg-cell pg-row-last sp-col"><input type="date" id="scdSpouse"></div>
+      </div>
+      <script>renderQ("1e")</script>
+    </div>
+
+  </div>
+  <div class="nav-bar">
+    <button class="btn btn-secondary" onclick="goPrev(1)">← Back</button>
+    <div class="nav-spacer"></div>
+    <button class="btn btn-primary" onclick="goNext(1)">Continue →</button>
+    <button class="btn btn-review jump-review-btn" style="display:none" onclick="jumpToReview()">→→ Return to review</button>
+  </div>
+</div>
+
+<!-- ══════════════════ SEC 2: WORKING INCOME & RETIREMENT DETAILS ══════════════════ -->
+<div class="section-card" id="sec2">
+  <div class="section-header">
+    <div class="section-num">2</div>
+    <div><div class="section-title">Working Income &amp; Retirement Details</div><div class="section-subtitle">Questions vary based on each person's employment status</div></div>
+  </div>
+  <div class="section-body">
+
+    <!-- ── YOU ── -->
+    <div class="person-banner" id="banner2you"><strong>You:</strong> Please answer the following questions about your ongoing employment.</div>
+
+    <!-- EMPLOYED — you -->
+    <div class="emp-only-you">
+      <div class="q-row">
+        <div class="q-label"><span class="q-num">2a</span><span class="q-text">Gross salary — <span data-yo="0">current year</span> and prior two years</span></div>
+        <div class="person-grid single-col force-single">
+          <div class="pg-header"></div>
+          <div class="pg-header you-hdr"><span class="dyn-you">You</span></div>
+          <div class="pg-label">Salary in&nbsp;<span data-yo="0">current year</span></div>
+          <div class="pg-cell"><span class="ds">$</span><input type="number" id="salYou_curr" min="0" placeholder="e.g. 197,200" data-default="197200"></div>
+          <div class="pg-label">Salary in&nbsp;<span data-yo="-1">prior year</span></div>
+          <div class="pg-cell"><span class="ds">$</span><input type="number" id="salYou_prev1" min="0" placeholder="e.g. 192,300" data-default="192300"></div>
+          <div class="pg-label pg-row-last">Salary in&nbsp;<span data-yo="-2">two years ago</span></div>
+          <div class="pg-cell pg-row-last"><span class="ds">$</span><input type="number" id="salYou_prev2" min="0" placeholder="e.g. 187,500" data-default="187500"></div>
+        </div>
+        <script>renderQ("2a")</script>
+      </div>
+
+      <div class="q-row">
+        <div class="q-label"><span class="q-num">2b</span><span class="q-text">Take-home pay per pay period</span></div>
+        <div class="dollar-row"><span class="ds">$</span><input type="number" id="takeYou" min="0" placeholder="e.g. 3,846" data-default="3846"></div>
+        <script>renderQ("2b")</script>
+      </div>
+
+      <div class="q-row">
+        <div class="q-label"><span class="q-num">2c</span><span class="q-text">Pay period frequency</span></div>
+        <select id="periodYou" style="max-width:200px;margin-top:.35rem">
+          <option value="">Select…</option>
+          <option value="bi-weekly">Bi-weekly</option>
+          <option value="weekly">Weekly</option>
+          <option value="monthly">Monthly</option>
+        </select>
+        <script>renderQ("2c")</script>
+      </div>
+
+      <div class="q-row">
+        <div class="q-label"><span class="q-num">2d</span><span class="q-text">Adjustments to annual take-home <span class="opt">(optional)</span></span></div>
+        <div class="dollar-row"><span class="ds">$</span><input type="number" id="adjYou" placeholder="e.g. 5,000" data-default="0"></div>
+        <script>renderQ("2d")</script>
+      </div>
+
+      <div class="q-row">
+        <div class="q-label"><span class="q-num">2e</span><span class="q-text">Expected annual salary increase (%)</span></div>
+        <div class="pct-row"><input type="number" id="riseYou" step="0.1" min="0" max="20" placeholder="e.g. 2.5" data-default="2.5"><span class="ps">%</span></div>
+        <script>renderQ("2e")</script>
+      </div>
+    </div><!-- /emp-only-you -->
+
+    <!-- RETIRED — you -->
+    <div class="ret-only-you" style="display:none">
+      <div class="branch-block">
+        <div class="branch-label">Because you indicated you are retired…</div>
+
+        <div class="q-row">
+          <div class="q-label"><span class="q-num">2a</span><span class="q-text">Retirement date</span></div>
+          <input type="date" id="retDate_you" style="max-width:200px;margin-top:.35rem" onchange="updateRetYrLabels('you');applyBranching()">
+          <script>renderQ("2_ret_date")</script>
+        </div>
+
+        <div class="q-row">
+          <div class="q-label"><span class="q-num">2b</span><span class="q-text">Currently receiving your pension?</span></div>
+          <div class="radio-group" id="hasPension_you" style="margin-top:.35rem">
+            <div class="radio-btn" data-val="Yes" onclick="selectRadio('hasPension_you',this);applyBranching()">Yes</div>
+            <div class="radio-btn" data-val="No" onclick="selectRadio('hasPension_you',this);applyBranching()">No</div>
+          </div>
+          <script>renderQ("2_ret_pension_q")</script>
+        </div>
+
+        <div class="pen-yes-you" style="display:none">
+          <div class="branch-block" style="margin-top:.65rem">
+            <div class="branch-label">Because you are receiving your pension…</div>
+            <div class="q-row" style="margin-bottom:0">
+              <div class="q-label"><span class="q-num">2c</span><span class="q-text">Pension amount (per month)</span></div>
+              <div class="dollar-row"><span class="ds">$</span><input type="number" id="penAmt_you" min="0" placeholder="e.g. 6,250" data-default="6250"></div>
+              <script>renderQ("2_ret_pen_amt")</script>
+            </div>
+          </div>
+        </div>
+
+        <div class="pen-no-you" style="display:none">
+          <div class="branch-block" style="margin-top:.65rem">
+            <div class="branch-label">Because you are not yet receiving your pension…</div>
+            <div class="q-row" style="margin-bottom:0">
+              <div class="q-label"><span class="q-num">2c</span><span class="q-text">Salary history at retirement</span></div>
+              <div class="person-grid single-col force-single" style="margin-top:.4rem">
+                <div class="pg-header"></div>
+                <div class="pg-header you-hdr"><span class="dyn-you">You</span></div>
+                <div class="pg-label">Salary in&nbsp;<span id="retYrYou_0">retirement year</span></div>
+                <div class="pg-cell"><span class="ds">$</span><input type="number" id="salRet_you_0" min="0" placeholder="e.g. 150,000" data-default="150000"></div>
+                <div class="pg-label">Salary in&nbsp;<span id="retYrYou_1">year before</span></div>
+                <div class="pg-cell"><span class="ds">$</span><input type="number" id="salRet_you_1" min="0" placeholder="e.g. 145,000" data-default="145000"></div>
+                <div class="pg-label pg-row-last">Salary in&nbsp;<span id="retYrYou_2">two years before</span></div>
+                <div class="pg-cell pg-row-last"><span class="ds">$</span><input type="number" id="salRet_you_2" min="0" placeholder="e.g. 140,000" data-default="140000"></div>
+              </div>
+              <script>renderQ("2i_ret_you")</script>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div><!-- /ret-only-you -->
+
+    <!-- ── SPOUSE ── -->
+    <div class="sp-col">
+      <hr class="div">
+      <div class="person-banner" id="banner2sp" style="margin-top:.5rem"><strong>Your Spouse:</strong> Please answer the following questions about your spouse's ongoing employment.</div>
+
+      <!-- EMPLOYED — spouse -->
+      <div class="emp-only-sp">
+        <div class="q-row">
+          <div class="q-label"><span class="q-num">2f</span><span class="q-text">Gross salary — <span data-yo="0">current year</span> and prior two years</span></div>
+          <div class="person-grid single-col force-single">
+            <div class="pg-header"></div>
+            <div class="pg-header sp-hdr"><span class="dyn-sp">Your Spouse</span></div>
+            <div class="pg-label">Salary in&nbsp;<span data-yo="0">current year</span></div>
+            <div class="pg-cell"><span class="ds">$</span><input type="number" id="salSp_curr" min="0" placeholder="e.g. 175,000" data-default="175000"></div>
+            <div class="pg-label">Salary in&nbsp;<span data-yo="-1">prior year</span></div>
+            <div class="pg-cell"><span class="ds">$</span><input type="number" id="salSp_prev1" min="0" placeholder="e.g. 170,000" data-default="170000"></div>
+            <div class="pg-label pg-row-last">Salary in&nbsp;<span data-yo="-2">two years ago</span></div>
+            <div class="pg-cell pg-row-last"><span class="ds">$</span><input type="number" id="salSp_prev2" min="0" placeholder="e.g. 165,000" data-default="165000"></div>
+          </div>
+          <script>renderQ("2f_emp")</script>
+        </div>
+
+        <div class="q-row">
+          <div class="q-label"><span class="q-num">2g</span><span class="q-text">Take-home pay per pay period</span></div>
+          <div class="dollar-row"><span class="ds">$</span><input type="number" id="takeSp" min="0" placeholder="e.g. 3,121" data-default="3121"></div>
+          <script>renderQ("2g_emp")</script>
+        </div>
+
+        <div class="q-row">
+          <div class="q-label"><span class="q-num">2h</span><span class="q-text">Pay period frequency</span></div>
+          <select id="periodSp" style="max-width:200px;margin-top:.35rem">
+            <option value="">Select…</option>
+            <option value="bi-weekly">Bi-weekly</option>
+            <option value="weekly">Weekly</option>
+            <option value="monthly">Monthly</option>
+          </select>
+        </div>
+
+        <div class="q-row">
+          <div class="q-label"><span class="q-num">2i</span><span class="q-text">Adjustments to annual take-home <span class="opt">(optional)</span></span></div>
+          <div class="dollar-row"><span class="ds">$</span><input type="number" id="adjSp" placeholder="e.g. 4,000" data-default="0"></div>
+          <script>renderQ("2i_emp")</script>
+        </div>
+
+        <div class="q-row">
+          <div class="q-label"><span class="q-num">2j</span><span class="q-text">Expected annual salary increase (%)</span></div>
+          <div class="pct-row"><input type="number" id="riseSp" step="0.1" min="0" max="20" placeholder="e.g. 2.5" data-default="2.5"><span class="ps">%</span></div>
+          <script>renderQ("2j")</script>
+        </div>
+      </div><!-- /emp-only-sp -->
+
+      <!-- RETIRED — spouse -->
+      <div class="ret-only-sp" style="display:none">
+        <div class="branch-block">
+          <div class="branch-label">Because <span class="dyn-sp">your spouse</span> is retired…</div>
+
+          <div class="q-row">
+            <div class="q-label"><span class="q-num">2f</span><span class="q-text">Retirement date</span></div>
+            <input type="date" id="retDate_sp" style="max-width:200px;margin-top:.35rem" onchange="updateRetYrLabels('sp');applyBranching()">
+            <script>renderQ("2f_ret")</script>
+          </div>
+
+          <div class="q-row">
+            <div class="q-label"><span class="q-num">2g</span><span class="q-text">Currently receiving pension?</span></div>
+            <div class="radio-group" id="hasPension_sp" style="margin-top:.35rem">
+              <div class="radio-btn" data-val="Yes" onclick="selectRadio('hasPension_sp',this);applyBranching()">Yes</div>
+              <div class="radio-btn" data-val="No" onclick="selectRadio('hasPension_sp',this);applyBranching()">No</div>
+            </div>
+            <script>renderQ("2g_ret")</script>
+          </div>
+
+          <div class="pen-yes-sp" style="display:none">
+            <div class="branch-block" style="margin-top:.65rem">
+              <div class="branch-label">Because <span class="dyn-sp">your spouse</span> is receiving their pension…</div>
+              <div class="q-row" style="margin-bottom:0">
+                <div class="q-label"><span class="q-num">2h</span><span class="q-text">Pension amount (per month)</span></div>
+                <div class="dollar-row"><span class="ds">$</span><input type="number" id="penAmt_sp" min="0" placeholder="e.g. 6,250" data-default="6250"></div>
+                <script>renderQ("2h_ret")</script>
+              </div>
+            </div>
+          </div>
+
+          <div class="pen-no-sp" style="display:none">
+            <div class="branch-block" style="margin-top:.65rem">
+              <div class="branch-label">Because <span class="dyn-sp">your spouse</span> is not yet receiving their pension…</div>
+              <div class="q-row" style="margin-bottom:0">
+                <div class="q-label"><span class="q-num">2h</span><span class="q-text">Salary history at retirement</span></div>
+                <div class="person-grid single-col force-single" style="margin-top:.4rem">
+                  <div class="pg-header"></div>
+                  <div class="pg-header sp-hdr"><span class="dyn-sp">Your Spouse</span></div>
+                  <div class="pg-label">Salary in&nbsp;<span id="retYrSp_0">retirement year</span></div>
+                  <div class="pg-cell"><span class="ds">$</span><input type="number" id="salRet_sp_0" min="0" placeholder="e.g. 150,000" data-default="150000"></div>
+                  <div class="pg-label">Salary in&nbsp;<span id="retYrSp_1">year before</span></div>
+                  <div class="pg-cell"><span class="ds">$</span><input type="number" id="salRet_sp_1" min="0" placeholder="e.g. 145,000" data-default="145000"></div>
+                  <div class="pg-label pg-row-last">Salary in&nbsp;<span id="retYrSp_2">two years before</span></div>
+                  <div class="pg-cell pg-row-last"><span class="ds">$</span><input type="number" id="salRet_sp_2" min="0" placeholder="e.g. 140,000" data-default="140000"></div>
+                </div>
+                <script>renderQ("2i_ret")</script>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div><!-- /ret-only-sp -->
+    </div><!-- /sp-col -->
+
+  </div>
+  <div class="nav-bar">
+    <button class="btn btn-secondary" onclick="goPrev(2)">← Back</button>
+    <div class="nav-spacer"></div>
+    <button class="btn btn-primary" onclick="goNext(2)">Continue →</button>
+    <button class="btn btn-review jump-review-btn" style="display:none" onclick="jumpToReview()">→→ Return to review</button>
+  </div>
+</div>
+
+<!-- ══════════════════ SEC 3: RETIREMENT INCOME ══════════════════ -->
+<div class="section-card" id="sec3">
+  <div class="section-header">
+    <div class="section-num">3</div>
+    <div><div class="section-title">Retirement Income</div><div class="section-subtitle">Pension system and Social Security projections</div></div>
+  </div>
+  <div class="section-body">
+
+    <div class="sub-label">Pension</div>
+
+    <div class="q-row">
+      <div class="q-label"><span class="q-num">3a</span><span class="q-text">Retirement / pension system</span></div>
+      <div class="person-grid">
+        <div class="pg-header"></div>
+        <div class="pg-header you-hdr"><span class="dyn-you">You</span></div>
+        <div class="pg-header sp-hdr sp-col"><span class="dyn-sp">Your Spouse</span></div>
+        <div class="pg-label pg-row-last">System</div>
+        <div class="pg-cell pg-row-last">
+          <select id="retSys_you" style="font-size:.85rem">
+            <option value="">Select…</option>
+            <option value="FERS">FERS – Federal Employees Retirement System</option>
+            <option value="FSPS">FSPS – Foreign Service Pension System</option>
+            <option value="CSRS">CSRS – Civil Service Retirement System</option>
+            <option value="Other">Other</option>
+            <option value="None">None</option>
+          </select>
+        </div>
+        <div class="pg-cell pg-row-last sp-col">
+          <select id="retSys_sp" style="font-size:.85rem">
+            <option value="">Select…</option>
+            <option value="FERS">FERS</option>
+            <option value="FSPS">FSPS</option>
+            <option value="CSRS">CSRS</option>
+            <option value="Other">Other</option>
+            <option value="None">None / not a federal employee</option>
+          </select>
+        </div>
+      </div>
+      <script>renderQ("3a")</script>
+    </div>
+
+    <div class="q-row">
+      <div class="q-label"><span class="q-num">3b</span><span class="q-text">Survivor benefit</span></div>
+      <div class="person-grid">
+        <div class="pg-header"></div>
+        <div class="pg-header you-hdr"><span class="dyn-you">You</span></div>
+        <div class="pg-header sp-hdr sp-col"><span class="dyn-sp">Your Spouse</span></div>
+        <div class="pg-label pg-row-last">Benefit elected</div>
+        <div class="pg-cell pg-row-last">
+          <select id="surv_you" style="font-size:.85rem;max-width:160px">
+            <option value="">Select…</option>
+            <option value="50">50%</option>
+            <option value="25">25%</option>
+            <option value="0">0% (none)</option>
+          </select>
+        </div>
+        <div class="pg-cell pg-row-last sp-col">
+          <select id="surv_sp" style="font-size:.85rem;max-width:160px">
+            <option value="">Select…</option>
+            <option value="50">50%</option>
+            <option value="25">25%</option>
+            <option value="0">0% (none)</option>
+          </select>
+        </div>
+      </div>
+      <script>renderQ("3b")</script>
+    </div>
+
+    <div class="q-row">
+      <div class="q-label"><span class="q-num">3c</span><span class="q-text">Other (non-federal) pension amount <span class="opt">(optional)</span></span></div>
+      <div class="person-grid">
+        <div class="pg-header"></div>
+        <div class="pg-header you-hdr"><span class="dyn-you">You</span></div>
+        <div class="pg-header sp-hdr sp-col"><span class="dyn-sp">Your Spouse</span></div>
+        <div class="pg-label pg-row-last">Annual amount</div>
+        <div class="pg-cell pg-row-last"><span class="ds">$</span><input type="number" id="otherPen_you" min="0" placeholder="e.g. 12,000" data-default="0"></div>
+        <div class="pg-cell pg-row-last sp-col"><span class="ds">$</span><input type="number" id="otherPen_sp" min="0" placeholder="e.g. 0" data-default="0"></div>
+      </div>
+      <script>renderQ("3c")</script>
+    </div>
+
+    <div class="sub-label">Social Security — you will need your SSA statement from ssa.gov</div>
+
+    <div class="q-row">
+      <div class="q-label"><span class="q-num">3d</span><span class="q-text">Planned Social Security start age</span></div>
+      <div class="person-grid">
+        <div class="pg-header"></div>
+        <div class="pg-header you-hdr"><span class="dyn-you">You</span></div>
+        <div class="pg-header sp-hdr sp-col"><span class="dyn-sp">Your Spouse</span></div>
+        <div class="pg-label pg-row-last">Start at age</div>
+        <div class="pg-cell pg-row-last">
+          <div class="radio-group" id="ssaStart_you">
+            <div class="radio-btn" data-val="62" onclick="selectRadio('ssaStart_you',this)">62</div>
+            <div class="radio-btn" data-val="64" onclick="selectRadio('ssaStart_you',this)">64</div>
+            <div class="radio-btn selected" data-val="67" onclick="selectRadio('ssaStart_you',this)">67</div>
+            <div class="radio-btn" data-val="70" onclick="selectRadio('ssaStart_you',this)">70</div>
+          </div>
+        </div>
+        <div class="pg-cell pg-row-last sp-col">
+          <div class="radio-group" id="ssaStart_sp">
+            <div class="radio-btn" data-val="62" onclick="selectRadio('ssaStart_sp',this)">62</div>
+            <div class="radio-btn" data-val="64" onclick="selectRadio('ssaStart_sp',this)">64</div>
+            <div class="radio-btn selected" data-val="67" onclick="selectRadio('ssaStart_sp',this)">67</div>
+            <div class="radio-btn" data-val="70" onclick="selectRadio('ssaStart_sp',this)">70</div>
+          </div>
+        </div>
+      </div>
+      <script>renderQ("3d")</script>
+    </div>
+
+    <div class="q-row">
+      <div class="q-label"><span class="q-num">3e</span><span class="q-text">Social Security benefit amounts — enter monthly amounts</span></div>
+      <div class="person-grid">
+        <div class="pg-header"></div>
+        <div class="pg-header you-hdr"><span class="dyn-you">You</span></div>
+        <div class="pg-header sp-hdr sp-col"><span class="dyn-sp">Your Spouse</span></div>
+        <div class="pg-label">Monthly SSA at age 70</div>
+        <div class="pg-cell"><span class="ds">$</span><input type="number" id="ssa70_you" min="0" placeholder="e.g. 4,860" data-default="4860"></div>
+        <div class="pg-cell sp-col"><span class="ds">$</span><input type="number" id="ssa70_sp" min="0" placeholder="e.g. 3,800" data-default="3800"></div>
+        <div class="pg-label">Monthly SSA at age 67</div>
+        <div class="pg-cell"><span class="ds">$</span><input type="number" id="ssa67_you" min="0" placeholder="e.g. 3,808" data-default="3808"></div>
+        <div class="pg-cell sp-col"><span class="ds">$</span><input type="number" id="ssa67_sp" min="0" placeholder="e.g. 2,809" data-default="2809"></div>
+        <div class="pg-label">Monthly SSA at age 64</div>
+        <div class="pg-cell"><span class="ds">$</span><input type="number" id="ssa64_you" min="0" placeholder="e.g. 2,933" data-default="2933"></div>
+        <div class="pg-cell sp-col"><span class="ds">$</span><input type="number" id="ssa64_sp" min="0" placeholder="e.g. 2,038" data-default="2038"></div>
+        <div class="pg-label pg-row-last">Monthly SSA at age 62</div>
+        <div class="pg-cell pg-row-last"><span class="ds">$</span><input type="number" id="ssa62_you" min="0" placeholder="e.g. 2,507" data-default="2507"></div>
+        <div class="pg-cell pg-row-last sp-col"><span class="ds">$</span><input type="number" id="ssa62_sp" min="0" placeholder="e.g. 1,667" data-default="1667"></div>
+      </div>
+      <script>renderQ("3e")</script>
+    </div>
+
+    <div class="q-row">
+      <div class="q-label"><span class="q-num">3f</span><span class="q-text">Social Security statement year</span></div>
+      <input type="number" id="ssYear" min="2015" max="2040" style="width:110px;margin-top:.35rem" onchange="this._userEdited=true">
+      <script>renderQ("3f")</script>
+    </div>
+
+  </div>
+  <div class="nav-bar">
+    <button class="btn btn-secondary" onclick="goPrev(3)">← Back</button>
+    <div class="nav-spacer"></div>
+    <button class="btn btn-primary" onclick="goNext(3)">Continue →</button>
+    <button class="btn btn-review jump-review-btn" style="display:none" onclick="jumpToReview()">→→ Return to review</button>
+  </div>
+</div>
+
+<!-- ══════════════════ SEC 4: SAVINGS ══════════════════ -->
+<div class="section-card" id="sec4">
+  <div class="section-header">
+    <div class="section-num">4</div>
+    <div><div class="section-title">Savings</div><div class="section-subtitle">All balances as of December 31, <span data-yo="-1">last year</span></div></div>
+  </div>
+  <div class="section-body">
+
+    <div class="sub-label">TSP &amp; Other Retirement Savings</div>
+
+    <div class="q-row">
+      <div class="q-label"><span class="q-num">4a</span><span class="q-text">TSP enrollee?</span></div>
+      <div class="person-grid">
+        <div class="pg-header"></div>
+        <div class="pg-header you-hdr"><span class="dyn-you">You</span></div>
+        <div class="pg-header sp-hdr sp-col"><span class="dyn-sp">Your Spouse</span></div>
+        <div class="pg-label pg-row-last">TSP enrollee?</div>
+        <div class="pg-cell pg-row-last">
+          <div class="radio-group" id="tspEnrollee_you">
+            <div class="radio-btn selected" data-val="Yes" onclick="selectRadio('tspEnrollee_you',this)">Yes</div>
+            <div class="radio-btn" data-val="No" onclick="selectRadio('tspEnrollee_you',this)">No</div>
+          </div>
+        </div>
+        <div class="pg-cell pg-row-last sp-col">
+          <div class="radio-group" id="tspEnrollee_sp">
+            <div class="radio-btn selected" data-val="Yes" onclick="selectRadio('tspEnrollee_sp',this)">Yes</div>
+            <div class="radio-btn" data-val="No" onclick="selectRadio('tspEnrollee_sp',this)">No</div>
+          </div>
+        </div>
+      </div>
+      <script>renderQ("4a")</script>
+    </div>
+
+    <div class="q-row">
+      <div class="q-label"><span class="q-num">4b</span><span class="q-text">TSP balance as of Dec. 31, <span data-yo="-1">last year</span></span></div>
+      <div class="person-grid">
+        <div class="pg-header"></div>
+        <div class="pg-header you-hdr"><span class="dyn-you">You</span></div>
+        <div class="pg-header sp-hdr sp-col"><span class="dyn-sp">Your Spouse</span></div>
+        <div class="pg-label pg-row-last">Balance</div>
+        <div class="pg-cell pg-row-last"><span class="ds">$</span><input type="number" id="tspBal_you" min="0" placeholder="e.g. 995,000" data-default="995000" oninput="updateTotalSavings()"></div>
+        <div class="pg-cell pg-row-last sp-col"><span class="ds">$</span><input type="number" id="tspBal_sp" min="0" placeholder="e.g. 280,000" data-default="280000" oninput="updateTotalSavings()"></div>
+      </div>
+      <script>renderQ("4b")</script>
+    </div>
+
+    <!-- TSP contributions — employed only -->
+    <div id="tspContribBlock">
+      <div class="q-row">
+        <div class="q-label"><span class="q-num">4c</span><span class="q-text">TSP contribution — <span data-yo="0">current year</span></span></div>
+        <div class="person-grid">
+          <div class="pg-header"></div>
+          <div class="pg-header you-hdr"><span class="dyn-you">You</span></div>
+          <div class="pg-header sp-hdr sp-col"><span class="dyn-sp">Your Spouse</span></div>
+          <div class="pg-label pg-row-last">Contribution</div>
+          <div class="pg-cell pg-row-last emp-only-you"><span class="ds">$</span><input type="number" id="tspCon_you" min="0" placeholder="e.g. 32,000" data-default="32000"></div>
+          <div class="pg-cell pg-row-last sp-col emp-only-sp"><span class="ds">$</span><input type="number" id="tspCon_sp" min="0" placeholder="e.g. 32,000" data-default="32000"></div>
+        </div>
+        <script>renderQ("4c")</script>
+      </div>
+
+      <div class="q-row">
+        <div class="q-label"><span class="q-num">4d</span><span class="q-text">Annual TSP contribution — future years</span></div>
+        <div class="person-grid">
+          <div class="pg-header"></div>
+          <div class="pg-header you-hdr"><span class="dyn-you">You</span></div>
+          <div class="pg-header sp-hdr sp-col"><span class="dyn-sp">Your Spouse</span></div>
+          <div class="pg-label pg-row-last">Annual amount</div>
+          <div class="pg-cell pg-row-last emp-only-you"><span class="ds">$</span><input type="number" id="tspAnn_you" min="0" placeholder="e.g. 32,000" data-default="32000"></div>
+          <div class="pg-cell pg-row-last sp-col emp-only-sp"><span class="ds">$</span><input type="number" id="tspAnn_sp" min="0" placeholder="e.g. 32,000" data-default="32000"></div>
+        </div>
+        <script>renderQ("4d")</script>
+      </div>
+
+      <div class="q-row">
+        <div class="q-label"><span class="q-num">4e</span><span class="q-text">Max out TSP in future years?</span></div>
+        <div class="person-grid">
+          <div class="pg-header"></div>
+          <div class="pg-header you-hdr"><span class="dyn-you">You</span></div>
+          <div class="pg-header sp-hdr sp-col"><span class="dyn-sp">Your Spouse</span></div>
+          <div class="pg-label pg-row-last">Max out TSP?</div>
+          <div class="pg-cell pg-row-last emp-only-you">
+            <div class="radio-group" id="tspMax_you">
+              <div class="radio-btn selected" data-val="Yes" onclick="selectRadio('tspMax_you',this)">Yes</div>
+              <div class="radio-btn" data-val="No" onclick="selectRadio('tspMax_you',this)">No</div>
+            </div>
+          </div>
+          <div class="pg-cell pg-row-last sp-col emp-only-sp">
+            <div class="radio-group" id="tspMax_sp">
+              <div class="radio-btn selected" data-val="Yes" onclick="selectRadio('tspMax_sp',this)">Yes</div>
+              <div class="radio-btn" data-val="No" onclick="selectRadio('tspMax_sp',this)">No</div>
+            </div>
+          </div>
+        </div>
+        <script>renderQ("4e")</script>
+      </div>
+    </div><!-- /tspContribBlock -->
+
+    <div class="q-row">
+      <div class="q-label"><span class="q-num">4f</span><span class="q-text">Individual IRA / other retirement savings</span></div>
+      <div class="person-grid">
+        <div class="pg-header"></div>
+        <div class="pg-header you-hdr"><span class="dyn-you">You</span></div>
+        <div class="pg-header sp-hdr sp-col"><span class="dyn-sp">Your Spouse</span></div>
+        <div class="pg-label pg-row-last">Balance</div>
+        <div class="pg-cell pg-row-last"><span class="ds">$</span><input type="number" id="ira_you" min="0" placeholder="e.g. 93,000" data-default="93000" oninput="updateTotalSavings()"></div>
+        <div class="pg-cell pg-row-last sp-col"><span class="ds">$</span><input type="number" id="ira_sp" min="0" placeholder="e.g. 40,000" data-default="40000" oninput="updateTotalSavings()"></div>
+      </div>
+      <script>renderQ("4f")</script>
+    </div>
+
+    <div class="sub-label">Other Savings — per person, as of Dec. 31, <span data-yo="-1">last year</span></div>
+
+    <div class="q-row">
+      <div class="q-label"><span class="q-num">4g</span><span class="q-text">Other savings and finances</span></div>
+      <div class="person-grid">
+        <div class="pg-header"></div>
+        <div class="pg-header you-hdr"><span class="dyn-you">You</span></div>
+        <div class="pg-header sp-hdr sp-col"><span class="dyn-sp">Your Spouse</span></div>
+        <div class="pg-label">Stocks &amp; mutual funds</div>
+        <div class="pg-cell"><span class="ds">$</span><input type="number" id="stocks_you" min="0" placeholder="e.g. 350,000" data-default="350000" oninput="updateTotalSavings()"></div>
+        <div class="pg-cell sp-col"><span class="ds">$</span><input type="number" id="stocks_sp" min="0" placeholder="e.g. 309,000" data-default="309000" oninput="updateTotalSavings()"></div>
+        <div class="pg-label">Bonds</div>
+        <div class="pg-cell"><span class="ds">$</span><input type="number" id="bonds_you" min="0" placeholder="e.g. 60,000" data-default="60000" oninput="updateTotalSavings()"></div>
+        <div class="pg-cell sp-col"><span class="ds">$</span><input type="number" id="bonds_sp" min="0" placeholder="e.g. 67,000" data-default="67000" oninput="updateTotalSavings()"></div>
+        <div class="pg-label">Savings account</div>
+        <div class="pg-cell"><span class="ds">$</span><input type="number" id="savingsAcct_you" min="0" placeholder="e.g. 250,000" data-default="250000" oninput="updateTotalSavings()"></div>
+        <div class="pg-cell sp-col"><span class="ds">$</span><input type="number" id="savingsAcct_sp" min="0" placeholder="e.g. 247,000" data-default="247000" oninput="updateTotalSavings()"></div>
+        <div class="pg-label">Checking account</div>
+        <div class="pg-cell"><span class="ds">$</span><input type="number" id="checking_you" min="0" placeholder="e.g. 12,000" data-default="12000" oninput="updateTotalSavings()"></div>
+        <div class="pg-cell sp-col"><span class="ds">$</span><input type="number" id="checking_sp" min="0" placeholder="e.g. 11,000" data-default="11000" oninput="updateTotalSavings()"></div>
+        <div class="pg-label pg-row-last">Other</div>
+        <div class="pg-cell pg-row-last"><span class="ds">$</span><input type="number" id="otherSav_you" min="0" placeholder="e.g. 0" data-default="0" oninput="updateTotalSavings()"></div>
+        <div class="pg-cell pg-row-last sp-col"><span class="ds">$</span><input type="number" id="otherSav_sp" min="0" placeholder="e.g. 0" data-default="0" oninput="updateTotalSavings()"></div>
+      </div>
+      <script>renderQ("4g")</script>
+    </div>
+
+    <!-- Total savings display -->
+    <div class="total-savings-box">
+      <span class="ts-label">Total savings (combined household)</span>
+      <span class="ts-value" id="totalSavingsDisplay">—</span>
+    </div>
+    <div style="font-size:.72rem;color:var(--text-light);margin-top:.4rem;text-align:right">Calculated automatically from your entries above — for your information only.</div>
+
+  </div>
+  <div class="nav-bar">
+    <button class="btn btn-secondary" onclick="goPrev(4)">← Back</button>
+    <div class="nav-spacer"></div>
+    <button class="btn btn-primary" onclick="goNext(4)">Continue →</button>
+    <button class="btn btn-review jump-review-btn" style="display:none" onclick="jumpToReview()">→→ Return to review</button>
+  </div>
+</div>
+
+<!-- ══════════════════ SEC 5: SPENDING NEEDS ══════════════════ -->
+<div class="section-card" id="sec5">
+  <div class="section-header">
+    <div class="section-num">5</div>
+    <div><div class="section-title">Spending Needs</div>
+    <div class="section-subtitle">In this section you will estimate your spending needs — both while employed and in retirement.  This can be difficult to do.  One approach is to look at how much your family actually spent over the past year, and then make some adjustments to estimate what a "typical year" looks like.  If you don't want to employ this approach, you can skip the first two questions and go straight to 5C.</div>
+    </div>
+  </div>
+  <div class="section-body">
+
+    <div class="working-spend-only">
+      <div class="q-row">
+        <div class="q-label"><span class="q-num">5a</span><span class="q-text">Total household outgo — last 12 months</span></div>
+        <div class="dollar-row"><span class="ds">$</span><input type="number" id="outgo" min="0" placeholder="e.g. 165,000" data-default="165000"></div>
+        <script>renderQ("5a")</script>
+      </div>
+
+      <div class="q-row">
+        <div class="q-label"><span class="q-num">5b</span><span class="q-text">Adjustments to spending figure <span class="opt">(optional)</span></span></div>
+        <div class="dollar-row"><span class="ds">$</span><input type="number" id="needsAdj" placeholder="e.g. 0" data-default="0"></div>
+        <script>renderQ("5b")</script>
+      </div>
+
+      <div class="q-row">
+        <div class="q-label"><span class="q-num">5c</span><span class="q-text">Household budget while employed</span></div>
+        <div class="dollar-row"><span class="ds">$</span><input type="number" id="need5c" min="0" placeholder="Calculated from 5A + 5B" data-default="0"></div>
+        <script>renderQ("5c")</script>
+      </div>
+    </div><!-- /working-spend-only -->
+
+    <div class="q-row">
+      <div class="q-label"><span class="q-num">5d</span><span class="q-text">Spending changes in retirement <span class="opt">(optional)</span></span></div>
+      <div class="dollar-row"><span class="ds">$</span><input type="number" id="retReductions" placeholder="e.g. –5,000" data-default="0"></div>
+      <script>renderQ("5d")</script>
+    </div>
+
+    <div class="q-row">
+      <div class="q-label"><span class="q-num">5e</span><span class="q-text">Household budget in retirement</span></div>
+      <div class="dollar-row"><span class="ds">$</span><input type="number" id="need5e" min="0" placeholder="Calculated from 5C + 5D" data-default="0"></div>
+      <script>renderQ("5e")</script>
+    </div>
+
+  </div>
+  <div class="nav-bar">
+    <button class="btn btn-secondary" onclick="goPrev(5)">← Back</button>
+    <div class="nav-spacer"></div>
+    <button class="btn btn-primary" onclick="goNext(5)">Continue →</button>
+    <button class="btn btn-review jump-review-btn" style="display:none" onclick="jumpToReview()">→→ Return to review</button>
+  </div>
+</div>
+
+<!-- ══════════════════ SEC 6: MORTGAGE, EXPENSES & TAXES ══════════════════ -->
+<div class="section-card" id="sec6">
+  <div class="section-header">
+    <div class="section-num">6</div>
+    <div><div class="section-title">Mortgage, Expenses &amp; Taxes</div><div class="section-subtitle">One-time items, mortgage, and state/local tax rate</div></div>
+  </div>
+  <div class="section-body">
+
+    <div class="sub-label">Mortgage <span style="font-weight:400;font-style:italic;text-transform:none;color:var(--text-light)">(leave blank if you have no mortgage)</span></div>
+
+    <div class="q-row">
+      <div class="q-label"><span class="q-num">6a</span><span class="q-text">Year mortgage is paid off <span class="opt">(optional)</span></span></div>
+      <input type="number" id="mortYear" min="2020" max="2080" placeholder="e.g. 2043" data-default="2043" style="width:130px;margin-top:.35rem">
+      <script>renderQ("6a")</script>
+    </div>
+
+    <div class="q-row">
+      <div class="q-label"><span class="q-num">6b</span><span class="q-text">Monthly mortgage payment — principal + interest <span class="opt">(optional)</span></span></div>
+      <div class="dollar-row"><span class="ds">$</span><input type="number" id="mortAmt" min="0" placeholder="e.g. 2,400" data-default="2400"></div>
+      <div id="prev-mortAmt" class="fmt-preview"></div>
+      <script>renderQ("6b")</script>
+    </div>
+
+    <hr class="div">
+    <div class="sub-label">Taxes</div>
+
+    <div class="q-row">
+      <div class="q-label"><span class="q-num">6c</span><span class="q-text">State &amp; local tax rate</span></div>
+      <div class="pct-row"><input type="number" id="taxRate" step="0.01" value="7.85" min="0" max="20"><span class="ps">%</span></div>
+      <script>renderQ("6c")</script>
+    </div>
+
+    <hr class="div">
+    <div class="sub-label">One-Time Expenses &amp; Windfalls</div>
+
+    <div class="q-row">
+      <div class="q-label"><span class="q-num">6d</span><span class="q-text">Future one-time items <span class="opt">(optional)</span></span></div>
+      <script>renderQ("6d")</script>
+      <table class="repeat-table">
+        <thead><tr>
+          <th style="width:88px">Year</th>
+          <th style="width:130px">Amount</th>
+          <th>Note / description</th>
+          <th style="width:32px"></th>
+        </tr></thead>
+        <tbody id="expBody"></tbody>
+      </table>
+      <button class="add-row-btn" id="addExpBtn" onclick="addExpRow()">+ Add item</button>
+    </div>
+
+  </div>
+  <div class="nav-bar">
+    <button class="btn btn-secondary" onclick="goPrev(6)">← Back</button>
+    <div class="nav-spacer"></div>
+    <button class="btn btn-primary" onclick="goNext(6)">Continue →</button>
+    <button class="btn btn-review jump-review-btn" style="display:none" onclick="jumpToReview()">→→ Return to review</button>
+  </div>
+</div>
+
+<!-- ══════════════════ SEC 7: FUTURE WORK ══════════════════ -->
+<div class="section-card" id="sec7">
+  <div class="section-header">
+    <div class="section-num">7</div>
+    <div><div class="section-title">Future Work</div><div class="section-subtitle">Optional — income from a second career or part-time work after retirement</div></div>
+  </div>
+  <div class="section-body">
+    <div class="q-row">
+      <div class="q-label"><span class="q-num">7a</span><span class="q-text">Future annual income <span class="opt">(optional)</span></span></div>
+      <div class="person-grid">
+        <div class="pg-header"></div>
+        <div class="pg-header you-hdr"><span class="dyn-you">You</span></div>
+        <div class="pg-header sp-hdr sp-col"><span class="dyn-sp">Your Spouse</span></div>
+        <div class="pg-label pg-row-last">Annual income</div>
+        <div class="pg-cell pg-row-last"><span class="ds">$</span><input type="number" id="futInc_you" min="0" placeholder="e.g. 20,000" data-default="0"></div>
+        <div class="pg-cell pg-row-last sp-col"><span class="ds">$</span><input type="number" id="futInc_sp" min="0" placeholder="e.g. 0" data-default="0"></div>
+      </div>
+      <script>renderQ("7a")</script>
+    </div>
+
+    <div class="q-row">
+      <div class="q-label"><span class="q-num">7b</span><span class="q-text">Future work years <span class="opt">(optional)</span></span></div>
+      <div class="person-grid">
+        <div class="pg-header"></div>
+        <div class="pg-header you-hdr"><span class="dyn-you">You</span></div>
+        <div class="pg-header sp-hdr sp-col"><span class="dyn-sp">Your Spouse</span></div>
+        <div class="pg-label">Start year</div>
+        <div class="pg-cell"><input type="number" id="futStart_you" min="2020" max="2080" placeholder="e.g. 2028" data-default="2028" style="width:88px"></div>
+        <div class="pg-cell sp-col"><input type="number" id="futStart_sp" min="2020" max="2080" placeholder="e.g. 2028" data-default="2028" style="width:88px"></div>
+        <div class="pg-label pg-row-last">End year</div>
+        <div class="pg-cell pg-row-last"><input type="number" id="futEnd_you" min="2020" max="2080" placeholder="e.g. 2033" data-default="2033" style="width:88px"></div>
+        <div class="pg-cell pg-row-last sp-col"><input type="number" id="futEnd_sp" min="2020" max="2080" placeholder="e.g. 2033" data-default="2033" style="width:88px"></div>
+      </div>
+      <script>renderQ("7b")</script>
+    </div>
+  </div>
+  <div class="nav-bar">
+    <button class="btn btn-secondary" onclick="goPrev(7)">← Back</button>
+    <div class="nav-spacer"></div>
+    <button class="btn btn-primary" onclick="goNext(7)">Continue →</button>
+    <button class="btn btn-review jump-review-btn" style="display:none" onclick="jumpToReview()">→→ Return to review</button>
+  </div>
+</div>
+
+<!-- ══════════════════ SEC 8: COLLEGE ══════════════════ -->
+<div class="section-card" id="sec8">
+  <div class="section-header">
+    <div class="section-num">8</div>
+    <div><div class="section-title">College Costs</div><div class="section-subtitle">Optional — up to 5 children</div></div>
+  </div>
+  <div class="section-body">
+    <div class="q-row">
+      <div class="q-label"><span class="q-num">8a–8d</span><span class="q-text">College information by child <span class="opt">(optional)</span></span></div>
+      <script>renderQ("8a")</script>
+      <table class="repeat-table">
+        <thead><tr>
+          <th>Child's name</th>
+          <th style="width:88px">Year start</th>
+          <th style="width:120px">Annual tuition</th>
+          <th style="width:120px">Savings</th>
+          <th style="width:32px"></th>
+        </tr></thead>
+        <tbody id="colBody"></tbody>
+      </table>
+      <button class="add-row-btn" id="addColBtn" onclick="addColRow()">+ Add a child</button>
+    </div>
+  </div>
+  <div class="nav-bar">
+    <button class="btn btn-secondary" onclick="goPrev(8)">← Back</button>
+    <div class="nav-spacer"></div>
+    <button class="btn btn-primary" onclick="goNext(8)">Continue →</button>
+    <button class="btn btn-review jump-review-btn" style="display:none" onclick="jumpToReview()">→→ Return to review</button>
+  </div>
+</div>
+
+<!-- ══════════════════ SEC 9: RETIREMENT AGE TESTS ══════════════════ -->
+<div class="section-card" id="sec9">
+  <div class="section-header">
+    <div class="section-num">9</div>
+    <div><div class="section-title">Retirement Age Tests</div>
+    <div class="section-subtitle">Enter the retirement ages you'd like to model.  You may enter up to four sets of ages.  If a spouse is already retired, that is marked.</div>
+    </div>
+  </div>
+  <div class="section-body">
+
+    <!-- Both retired -->
+    <div id="bothRetiredNote" style="display:none">
+      <div class="warn-box">Both spouses are already retired.  A single projection will be made using your current ages — no additional input is needed here.</div>
+      <div class="q-row">
+        <div class="q-label"><span class="q-num">9b</span><span class="q-text">Inheritance amount <span class="opt">(optional)</span></span></div>
+        <div class="dollar-row"><span class="ds">$</span><input type="number" id="testInh1" min="0" placeholder="e.g. 0" data-default="0"></div>
+        <script>renderQ("9b")</script>
+      </div>
+    </div>
+
+    <!-- Normal test table -->
+    <div id="testTableWrap">
+      <div class="q-row">
+        <div class="q-label"><span class="q-num">9a</span><span class="q-text">Proposed retirement ages to analyze</span></div>
+        <script>renderQ("9a")</script>
+        <table class="repeat-table" style="margin-top:.65rem">
+          <thead><tr>
+            <th style="width:65px">Test</th>
+            <th id="testYouHdr">Your retirement age</th>
+            <th id="testSpHdr" style="display:none">Spouse's retirement age</th>
+            <th>Inheritance <span style="font-weight:400;font-style:italic;text-transform:none;letter-spacing:0">(optional)</span></th>
+            <th style="width:32px"></th>
+          </tr></thead>
+          <tbody id="testBody"></tbody>
+        </table>
+        <button class="add-row-btn" id="addTestBtn" onclick="addTestRow()" style="margin-top:.6rem">+ Add another scenario</button>
+      </div>
+    </div>
+
+  </div>
+  <div class="nav-bar">
+    <button class="btn btn-secondary" onclick="goPrev(9)">← Back</button>
+    <div class="nav-spacer"></div>
+    <button class="btn btn-primary" onclick="goNext(9)">Continue →</button>
+    <button class="btn btn-review jump-review-btn" style="display:none" onclick="jumpToReview()">→→ Return to review</button>
+  </div>
+</div>
+
+<!-- ══════════════════ SEC 10: ECONOMIC VARIABLES ══════════════════ -->
+<div class="section-card" id="sec10">
+  <div class="section-header">
+    <div class="section-num">10</div>
+    <div><div class="section-title">Economic Variables</div><div class="section-subtitle">Pre-filled with recommended defaults — change only if you have a specific reason</div></div>
+  </div>
+  <div class="section-body">
+    <div class="warn-box"><strong>Note:</strong>  The values below have been carefully researched and represent reasonable long-term assumptions.  They are provided here in case you wish to model a more optimistic or pessimistic scenario, but the defaults are recommended for most analyses.</div>
+
+    <div class="sub-label">Market Annual Returns</div>
+
+    <div class="q-row">
+      <div class="q-label"><span class="q-num">10a</span><span class="q-text">TSP annual return</span></div>
+      <div class="pct-row"><input type="number" id="retTSP" step="0.1" value="6.0"><span class="ps">%</span></div>
+      <script>renderQ("10a")</script>
+    </div>
+
+    <div class="q-row">
+      <div class="q-label"><span class="q-num">10b</span><span class="q-text">Stocks &amp; mutual funds return</span></div>
+      <div class="pct-row"><input type="number" id="retStocks" step="0.1" value="8.0"><span class="ps">%</span></div>
+      <script>renderQ("10b")</script>
+    </div>
+
+    <div class="q-row">
+      <div class="q-label"><span class="q-num">10c</span><span class="q-text">Bonds return</span></div>
+      <div class="pct-row"><input type="number" id="retBonds" step="0.1" value="5.0"><span class="ps">%</span></div>
+      <script>renderQ("10c")</script>
+    </div>
+
+    <div class="q-row">
+      <div class="q-label"><span class="q-num">10d</span><span class="q-text">Savings account yield</span></div>
+      <div class="pct-row"><input type="number" id="retSavings" step="0.01" value="3.5"><span class="ps">%</span></div>
+      <script>renderQ("10d")</script>
+    </div>
+
+    <div class="q-row">
+      <div class="q-label"><span class="q-num">10e</span><span class="q-text">Checking account yield</span></div>
+      <div class="pct-row"><input type="number" id="retChecking" step="0.01" value="0"><span class="ps">%</span></div>
+      <script>renderQ("10e")</script>
+    </div>
+
+    <div class="q-row">
+      <div class="q-label"><span class="q-num">10f</span><span class="q-text">Other savings yield</span></div>
+      <div class="pct-row"><input type="number" id="retOther" step="0.01" value="0"><span class="ps">%</span></div>
+      <script>renderQ("10f")</script>
+    </div>
+
+    <div class="sub-label">Other Economic Variables</div>
+
+    <div class="q-row">
+      <div class="q-label"><span class="q-num">10g</span><span class="q-text">Inflation rate</span></div>
+      <div class="pct-row"><input type="number" id="inflation" step="0.01" value="3.3"><span class="ps">%</span></div>
+      <script>renderQ("10g")</script>
+    </div>
+
+    <div class="q-row">
+      <div class="q-label"><span class="q-num">10h</span><span class="q-text">College cost increase</span></div>
+      <div class="pct-row"><input type="number" id="collegeInc" step="0.01" value="5.66"><span class="ps">%</span></div>
+      <script>renderQ("10h")</script>
+    </div>
+
+    <div class="q-row">
+      <div class="q-label"><span class="q-num">10i</span><span class="q-text">FSPS COLA</span></div>
+      <div class="pct-row"><input type="number" id="fspsCola" step="0.01" value="2.0"><span class="ps">%</span></div>
+      <script>renderQ("10i")</script>
+    </div>
+
+    <div class="q-row">
+      <div class="q-label"><span class="q-num">10j</span><span class="q-text">Social Security COLA</span></div>
+      <div class="pct-row"><input type="number" id="ssCola" step="0.01" value="2.5"><span class="ps">%</span></div>
+      <script>renderQ("10j")</script>
+    </div>
+
+  </div>
+  <div class="nav-bar">
+    <button class="btn btn-secondary" onclick="goPrev(10)">← Back</button>
+    <div class="nav-spacer"></div>
+    <button class="btn btn-gold" onclick="goNext(10)">Review answers →</button>
+    <button class="btn btn-review jump-review-btn" style="display:none" onclick="jumpToReview()">→→ Return to review</button>
+  </div>
+</div>
+
+<!-- ══════════════════ SEC 11: REVIEW ══════════════════ -->
+<div class="section-card" id="sec11">
+  <div class="section-header">
+    <div class="section-num">✓</div>
+    <div><div class="section-title">Review Your Answers</div><div class="section-subtitle">Confirm everything looks correct, then download your data file</div></div>
+  </div>
+  <div class="section-body" id="reviewBody"></div>
+  <div class="nav-bar">
+    <button class="btn btn-secondary" onclick="goPrev(11)">← Back</button>
+    <div class="nav-spacer"></div>
+    <button class="btn btn-gold" onclick="generateXLSX()">⬇ Download data file</button>
+  </div>
+</div>
+
+</div><!-- /container -->
+
+<div class="success-screen" id="successScreen">
+  <div class="success-icon">✓</div>
+  <h2>Your data file is ready.</h2>
+  <p>The file has been downloaded.  Please send it to your advisor so the Monte Carlo analysis can be run.</p>
+  <button class="btn btn-secondary" onclick="startOver()">Start over</button>
+</div>
+
+</body>
+</html>
